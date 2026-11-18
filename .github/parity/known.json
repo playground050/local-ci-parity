@@ -5,70 +5,107 @@
       "id": "work-dir",
       "reason": "作業ディレクトリが /home/runner/work ではなく /home/runner/_work（ファイル名の UUID も実行ごとに違う）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md",
-      "kinds": ["differ"],
-      "keys": ["probe\\.(env_github|contexts\\.github|contexts\\.runner|system)\\.", "probe\\.contexts\\.github\\."],
-      "normalize": [["/home/runner/_?work", "/home/runner/WORK"], ["[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", "UUID"]]
+      "kinds": [
+        "differ"
+      ],
+      "keys": [
+        "probe\\.(env_github|contexts\\.github|contexts\\.runner|system)\\.",
+        "probe\\.contexts\\.github\\."
+      ],
+      "normalize": [
+        [
+          "/home/runner/_?work",
+          "/home/runner/WORK"
+        ],
+        [
+          "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+          "UUID"
+        ]
+      ]
     },
     {
       "id": "api-emulation",
       "reason": "GitHub の API は Local CI 内部の代替サーバー（DTU）が答える",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#github-api-features-dtu-mock",
-      "keys": ["probe\\.env_github\\.(GITHUB_API_URL|GITHUB_GRAPHQL_URL|RUNNER_REPOSITORY_URL)$", "probe\\.git\\.remote$"]
+      "keys": [
+        "probe\\.env_github\\.(GITHUB_API_URL|GITHUB_GRAPHQL_URL|RUNNER_REPOSITORY_URL)$",
+        "probe\\.git\\.remote$"
+      ]
     },
     {
       "id": "runner-image",
       "reason": "実行環境が GitHub のホストランナーではなく、最小構成の actions-runner コンテナ（Ubuntu 24.04）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/runner-image.md",
-      "keys": ["probe\\.tools\\.", "probe\\.system\\.(os_release|locale)$"]
+      "keys": [
+        "probe\\.tools\\.",
+        "probe\\.system\\.(os_release|locale)$"
+      ]
     },
     {
       "id": "hosted-image-env",
       "reason": "GitHub のホストランナーのイメージにだけある環境変数（Android、Java、Go などのツール類）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/runner-image.md",
-      "kinds": ["github_only"],
-      "keys": ["probe\\.env_names\\[(?!GITHUB_|RUNNER_|ACTIONS_)[^\\]]+\\]$", "probe\\.env_(names\\[|github\\.)(ACTIONS_ORCHESTRATION_ID|ACTIONS_RUNNER_ACTION_ARCHIVE_CACHE|ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED|RUNNER_ENVIRONMENT)\\]?$"]
+      "kinds": [
+        "github_only"
+      ],
+      "keys": [
+        "probe\\.env_names\\[(?!GITHUB_|RUNNER_|ACTIONS_)[^\\]]+\\]$",
+        "probe\\.env_(names\\[|github\\.)(ACTIONS_ORCHESTRATION_ID|ACTIONS_RUNNER_ACTION_ARCHIVE_CACHE|ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED|RUNNER_ENVIRONMENT)\\]?$"
+      ]
     },
     {
       "id": "container-env",
       "reason": "Local CI のコンテナと Local CI 自身が設定する環境変数",
-      "kinds": ["local_only"],
-      "keys": ["probe\\.env_(names\\[|github\\.)(LOCAL_CI_|AGENT_CI_|RUNNER_TOKEN|RUNNER_REPOSITORY_URL|RUNNER_MANUALLY_TRAP_SIG|ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT|ACTIONS_RUNTIME_TOKEN|APP_UID|ASPNETCORE_HTTP_PORTS|DOTNET_RUNNING_IN_CONTAINER|FORCE_COLOR|TERM\\]|OLDPWD|LC_CTYPE)"]
+      "kinds": [
+        "local_only"
+      ],
+      "keys": [
+        "probe\\.env_(names\\[|github\\.)(LOCAL_CI_|AGENT_CI_|RUNNER_TOKEN|RUNNER_REPOSITORY_URL|RUNNER_MANUALLY_TRAP_SIG|ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT|ACTIONS_RUNTIME_TOKEN|APP_UID|ASPNETCORE_HTTP_PORTS|DOTNET_RUNNING_IN_CONTAINER|FORCE_COLOR|TERM\\]|OLDPWD|LC_CTYPE)"
+      ]
     },
     {
       "id": "checkout-copy",
       "reason": "actions/checkout は手元の作業ディレクトリをコピーする（履歴は 1 コミット、ブランチ名なし、未コミット扱い）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#github-api-features-dtu-mock",
-      "keys": ["probe\\.git\\.(branch|commit_count|last_commit_author|status_clean)$"]
+      "keys": [
+        "probe\\.git\\.(branch|commit_count|last_commit_author|status_clean)$"
+      ]
     },
     {
       "id": "no-events",
       "reason": "イベントは再現しない（常に push 扱い、github.event_name は空）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#workflow-level-keys",
-      "keys": ["probe\\.env_github\\.GITHUB_EVENT_NAME$", "probe\\.expressions\\.EXPR_EVENT$", "probe\\.contexts\\.github\\.event_name$"]
+      "keys": [
+        "probe\\.env_github\\.GITHUB_EVENT_NAME$",
+        "probe\\.expressions\\.EXPR_EVENT$",
+        "probe\\.contexts\\.github\\.event_name$"
+      ]
     },
     {
       "id": "github-context-static",
       "reason": "github コンテキストの多くは固定値か空（ref_name / head_ref は main、run_id は 1 など）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#expressions--",
-      "keys": ["probe\\.contexts\\.github\\.", "probe\\.env_github\\.(GITHUB_ACTION|GITHUB_JOB)$"]
+      "keys": [
+        "probe\\.contexts\\.github\\.",
+        "probe\\.env_github\\.(GITHUB_ACTION|GITHUB_JOB)$"
+      ]
     },
     {
       "id": "runner-context-partial",
       "reason": "runner コンテキストは os と arch だけ（name、temp、tool_cache などは空）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#expressions--",
-      "keys": ["probe\\.contexts\\.runner\\."]
+      "keys": [
+        "probe\\.contexts\\.runner\\."
+      ]
     },
     {
       "id": "job-steps-context",
-      "reason": "job / steps コンテキスト（job.status、steps.*.outcome など）は未対応",
+      "reason": "job / steps コンテキスト（job.status、steps.*.outcome など）は未対応（run: や env: の中では実行前に空へ置き換わる）",
       "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#expressions--",
-      "keys": ["probe\\.contexts\\.(job|steps)(\\.|$)", "after-soft-fail\\.job_status$"]
-    },
-    {
-      "id": "continue-on-error",
-      "reason": "continue-on-error は未対応（失敗した step で job が失敗になり、後続 job の needs.*.result も failure）",
-      "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#step-level-keys",
-      "keys": ["after-soft-fail\\.soft_fail$", "dependent\\.needs\\.probe\\.result$"]
+      "keys": [
+        "probe\\.contexts\\.(job|steps)(\\.|$)",
+        "after-soft-fail\\.(job_status|soft_fail)$"
+      ]
     }
   ]
 }
