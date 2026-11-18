@@ -115,7 +115,7 @@ jobs:
         run: |
           : > "$RUNNER_TEMP/github.log"
           for id in $(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs" \
-                        --jq '.jobs[] | select(.name | startswith("native")) | .id'); do
+                        --jq '.jobs[] | select((.name | startswith("native")) and .conclusion != "skipped") | .id'); do
             # ログには色付け用のエスケープ文字が含まれ、gh api は既定でその出力を拒否する
             gh api --allow-escape-sequences "repos/${{ github.repository }}/actions/jobs/$id/logs" >> "$RUNNER_TEMP/github.log"
           done
