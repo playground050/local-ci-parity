@@ -143,5 +143,7 @@ jobs:
           git add reports/gha
           git diff --cached --quiet && exit 0
           git commit -m "report: parity (GitHub Actions) $(date -u +%F) [skip ci]"
-          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done
+          # 同じ日に再実行すると同名のレポートがぶつかるため、今回の結果を優先して取り込む
+          # （rebase では -X theirs が「今回のコミット側」を指す）
+          for i in 1 2 3; do git pull --rebase -X theirs -q && git push -q && exit 0; sleep 5; done
           exit 1
