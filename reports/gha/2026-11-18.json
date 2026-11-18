@@ -9,15 +9,17 @@
   "differ": 43,
   "github_only": 121,
   "ignored": 38,
+  "known": 169,
   "local_only": 28,
-  "same": 79
+  "same": 79,
+  "unexpected": 23
  },
  "meta": {
-  "commit": "d80890bd792808ef4c2aef5b99ce1663f5ec1c9c",
+  "commit": "068880987f522c3f62ef4bc0d28229ce0812bf72",
   "date": "2026-11-18",
   "local_ci": "github:playground050/local-ci@fixes/all (d9500f7)",
   "local_ci_exit": "1",
-  "run": "https://github.com/playground050/local-ci-parity/actions/runs/44326164934",
+  "run": "https://github.com/playground050/local-ci-parity/actions/runs/44328178240",
   "where": "GitHub Actions (ubuntu-latest, Docker)"
  },
  "missing_jobs": {
@@ -29,1152 +31,1344 @@
    "github": "success",
    "key": "after-soft-fail.job_status",
    "kind": "differ",
+   "known": "job-steps-context",
    "local": ""
   },
   {
    "github": "failure/success",
    "key": "after-soft-fail.soft_fail",
    "kind": "differ",
+   "known": "continue-on-error",
    "local": "/"
   },
   {
    "github": "success",
    "key": "dependent.needs.probe.result",
    "kind": "differ",
+   "known": "continue-on-error",
    "local": "failure"
   },
   {
    "github": "__run",
    "key": "probe.contexts.github.action",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "",
    "key": "probe.contexts.github.action_ref",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "",
    "key": "probe.contexts.github.action_repository",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "https://api.github.com",
    "key": "probe.contexts.github.api_url",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "10",
    "key": "probe.contexts.github.artifact_cache_size_limit",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.artifacts",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.artifacts_list",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "",
    "key": "probe.contexts.github.base_ref",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.env",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "workflow_dispatch",
    "key": "probe.contexts.github.event_name",
    "kind": "github_only",
+   "known": "no-events",
    "local": "—"
   },
   {
    "github": "/home/runner/work/_temp/_github_workflow/event.json",
    "key": "probe.contexts.github.event_path",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "https://api.github.com/graphql",
    "key": "probe.contexts.github.graphql_url",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "",
    "key": "probe.contexts.github.head_ref",
    "kind": "differ",
+   "known": "github-context-static",
    "local": "main"
   },
   {
    "github": "—",
    "key": "probe.contexts.github.head_sha",
    "kind": "local_only",
+   "known": "github-context-static",
    "local": "0000000000000000000000000000000000000000"
   },
   {
    "github": "probe",
    "key": "probe.contexts.github.job",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.output",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.path",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "refs/heads/main",
    "key": "probe.contexts.github.ref",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "false",
    "key": "probe.contexts.github.ref_protected",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "branch",
    "key": "probe.contexts.github.ref_type",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "git://github.com/playground050/local-ci-parity.git",
    "key": "probe.contexts.github.repositoryUrl",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "public",
    "key": "probe.contexts.github.repository_visibility",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "<removed>",
    "key": "probe.contexts.github.secret_source",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "https://github.com",
    "key": "probe.contexts.github.server_url",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.state",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_a2c4487d-5a6c-413f-a821-c96478053750",
+   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_6b26a3c3-692a-4ca4-9237-2edbc39057ca",
    "key": "probe.contexts.github.step_summary",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "<removed>",
    "key": "probe.contexts.github.token",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "playground050",
    "key": "probe.contexts.github.triggering_actor",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "parity-weekly",
    "key": "probe.contexts.github.workflow",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "playground050/local-ci-parity/.github/workflows/parity-weekly.yml@refs/heads/main",
    "key": "probe.contexts.github.workflow_ref",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "/home/runner/work/local-ci-parity/local-ci-parity",
    "key": "probe.contexts.github.workspace",
    "kind": "github_only",
+   "known": "github-context-static",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.contexts.job",
    "kind": "local_only",
+   "known": "job-steps-context",
    "local": ""
   },
   {
    "github": "success",
    "key": "probe.contexts.job.status",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": ".github/workflows/parity-probe.yml",
    "key": "probe.contexts.job.workflow_file_path",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": "playground050/local-ci-parity/.github/workflows/parity-probe.yml@refs/heads/main",
    "key": "probe.contexts.job.workflow_ref",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": "playground050/local-ci-parity",
    "key": "probe.contexts.job.workflow_repository",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": "github-hosted",
    "key": "probe.contexts.runner.environment",
    "kind": "github_only",
+   "known": "runner-context-partial",
    "local": "—"
   },
   {
-   "github": "GitHub Actions 1000000197",
+   "github": "GitHub Actions 1000000203",
    "key": "probe.contexts.runner.name",
    "kind": "github_only",
+   "known": "runner-context-partial",
    "local": "—"
   },
   {
    "github": "/home/runner/work/_temp",
    "key": "probe.contexts.runner.temp",
    "kind": "github_only",
+   "known": "runner-context-partial",
    "local": "—"
   },
   {
    "github": "/opt/hostedtoolcache",
    "key": "probe.contexts.runner.tool_cache",
    "kind": "github_only",
+   "known": "runner-context-partial",
    "local": "—"
   },
   {
    "github": "/home/runner/work/local-ci-parity",
    "key": "probe.contexts.runner.workspace",
    "kind": "github_only",
+   "known": "runner-context-partial",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.contexts.steps",
    "kind": "local_only",
+   "known": "job-steps-context",
    "local": ""
   },
   {
    "github": "success",
    "key": "probe.contexts.steps.out.conclusion",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": "success",
    "key": "probe.contexts.steps.out.outcome",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": "42",
    "key": "probe.contexts.steps.out.outputs.answer",
    "kind": "github_only",
+   "known": "job-steps-context",
    "local": "—"
   },
   {
    "github": "/opt/actionarchivecache",
    "key": "probe.env_github.ACTIONS_RUNNER_ACTION_ARCHIVE_CACHE",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_github.ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT",
    "kind": "local_only",
+   "known": "container-env",
    "local": "1"
   },
   {
    "github": "1",
    "key": "probe.env_github.ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "__run",
    "key": "probe.env_github.GITHUB_ACTION",
    "kind": "differ",
+   "known": "github-context-static",
    "local": "probe"
   },
   {
    "github": "https://api.github.com",
    "key": "probe.env_github.GITHUB_API_URL",
    "kind": "differ",
-   "local": "http://host.docker.internal:38007"
+   "known": "api-emulation",
+   "local": "http://host.docker.internal:37925"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_ARTIFACTS",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_ARTIFACTS_LIST",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_list_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_list_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
    "github": "",
    "key": "probe.env_github.GITHUB_BASE_REF",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_ENV",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/set_env_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/set_env_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
    "github": "workflow_dispatch",
    "key": "probe.env_github.GITHUB_EVENT_NAME",
    "kind": "differ",
+   "known": "no-events",
    "local": "push"
   },
   {
    "github": "/home/runner/work/_temp/_github_workflow/event.json",
    "key": "probe.env_github.GITHUB_EVENT_PATH",
    "kind": "differ",
+   "known": "work-dir",
    "local": "/home/runner/_work/_temp/_github_workflow/event.json"
   },
   {
    "github": "https://api.github.com/graphql",
    "key": "probe.env_github.GITHUB_GRAPHQL_URL",
    "kind": "differ",
-   "local": "http://host.docker.internal:38007/_graphql"
+   "known": "api-emulation",
+   "local": "http://host.docker.internal:37925/_graphql"
   },
   {
    "github": "",
    "key": "probe.env_github.GITHUB_HEAD_REF",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "probe",
    "key": "probe.env_github.GITHUB_JOB",
    "kind": "differ",
+   "known": "github-context-static",
    "local": "local-job"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_OUTPUT",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/set_output_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/set_output_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_PATH",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/add_path_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/add_path_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
    "github": "main",
    "key": "probe.env_github.GITHUB_REF_NAME",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "false",
    "key": "probe.env_github.GITHUB_REF_PROTECTED",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "branch",
    "key": "probe.env_github.GITHUB_REF_TYPE",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "playground050",
    "key": "probe.env_github.GITHUB_REPOSITORY_OWNER",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_STATE",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/save_state_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/save_state_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_19f2772f-2e36-447f-8eab-a2832794b4a3",
+   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_7fa9a39b-d377-4cfd-872b-487e9ab40e6d",
    "key": "probe.env_github.GITHUB_STEP_SUMMARY",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/step_summary_321f359e-b388-4871-b7fb-09e8dbc8fb79"
+   "known": "work-dir",
+   "local": "/home/runner/_work/_temp/_runner_file_commands/step_summary_59b77824-c5d8-425b-a01f-deaa81235e13"
   },
   {
    "github": "playground050",
    "key": "probe.env_github.GITHUB_TRIGGERING_ACTOR",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "parity-weekly",
    "key": "probe.env_github.GITHUB_WORKFLOW",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "playground050/local-ci-parity/.github/workflows/parity-weekly.yml@refs/heads/main",
    "key": "probe.env_github.GITHUB_WORKFLOW_REF",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "/home/runner/work/local-ci-parity/local-ci-parity",
    "key": "probe.env_github.GITHUB_WORKSPACE",
    "kind": "differ",
+   "known": "work-dir",
    "local": "/home/runner/_work/local-ci-parity/local-ci-parity"
   },
   {
    "github": "github-hosted",
    "key": "probe.env_github.RUNNER_ENVIRONMENT",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_github.RUNNER_MANUALLY_TRAP_SIG",
    "kind": "local_only",
+   "known": "container-env",
    "local": "1"
   },
   {
    "github": "—",
    "key": "probe.env_github.RUNNER_REPOSITORY_URL",
    "kind": "local_only",
-   "local": "http://host.docker.internal:38007/playground050/local-ci-parity"
+   "known": "api-emulation",
+   "local": "http://host.docker.internal:37925/playground050/local-ci-parity"
   },
   {
    "github": "/home/runner/work/_temp",
    "key": "probe.env_github.RUNNER_TEMP",
    "kind": "differ",
+   "known": "work-dir",
    "local": "/home/runner/_work/_temp"
   },
   {
    "github": "/home/runner/work/local-ci-parity",
    "key": "probe.env_github.RUNNER_WORKSPACE",
    "kind": "differ",
+   "known": "work-dir",
    "local": "/home/runner/_work/local-ci-parity"
   },
   {
    "github": "present",
    "key": "probe.env_names[ACCEPT_EULA]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ACTIONS_ORCHESTRATION_ID]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ACTIONS_RUNNER_ACTION_ARCHIVE_CACHE]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[ACTIONS_RUNNER_RETURN_JOB_RESULT_FOR_HOSTED]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[ACTIONS_RUNTIME_TOKEN]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[AGENT_CI_DTU_HOST]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[AGENT_CI_HEAD_SHA]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[AGENT_CI_LOCAL]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[AGENT_CI_LOCAL_SYNC]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[AGENT_TOOLSDIRECTORY]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANDROID_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANDROID_NDK]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANDROID_NDK_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANDROID_NDK_LATEST_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANDROID_NDK_ROOT]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANDROID_SDK_ROOT]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ANT_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[APP_UID]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[ASPNETCORE_HTTP_PORTS]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[AZURE_EXTENSION_DIR]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[BOOTSTRAP_HASKELL_NONINTERACTIVE]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[CHROMEWEBDRIVER]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[CHROME_BIN]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[DOTNET_MULTILEVEL_LOOKUP]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[DOTNET_NOLOGO]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[DOTNET_RUNNING_IN_CONTAINER]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[DOTNET_SKIP_FIRST_TIME_EXPERIENCE]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[EDGEWEBDRIVER]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ENABLE_RUNNER_TRACING]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[FORCE_COLOR]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[GECKOWEBDRIVER]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GHCUP_INSTALL_BASE_PREFIX]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_ACTOR_ID]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_BASE_REF]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_HEAD_REF]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_REF_NAME]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_REF_PROTECTED]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_REF_TYPE]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_REPOSITORY_ID]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_REPOSITORY_OWNER]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_REPOSITORY_OWNER_ID]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_TRIGGERING_ACTOR]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_WORKFLOW]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GITHUB_WORKFLOW_REF]",
    "kind": "github_only",
+   "known": null,
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GOROOT_1_24_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GOROOT_1_25_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GOROOT_1_26_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[GRADLE_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[HCA_CLOUD_PROVIDER]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[HOMEBREW_NO_AUTO_UPDATE]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[ImageVersion]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[JAVA_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[JAVA_HOME_11_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[JAVA_HOME_17_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[JAVA_HOME_21_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[JAVA_HOME_25_X64]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[JOB_STATUS]",
    "kind": "local_only",
+   "known": null,
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[LANG]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[LC_CTYPE]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[LOCAL_CI_DTU_HOST]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[LOCAL_CI_HEAD_SHA]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[LOCAL_CI_LOCAL]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[LOCAL_CI_LOCAL_SYNC]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[LOGNAME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[MEMORY_PRESSURE_WATCH]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[MEMORY_PRESSURE_WRITE]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[NVM_DIR]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[OLDPWD]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[PIPX_BIN_DIR]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[PIPX_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[POWERSHELL_DISTRIBUTION_CHANNEL]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[PSModulePath]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[RUNNER_ENVIRONMENT]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[RUNNER_MANUALLY_TRAP_SIG]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[RUNNER_REPOSITORY_URL]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "—",
    "key": "probe.env_names[RUNNER_TOKEN]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[SELENIUM_JAR_PATH]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[SGX_AESM_ADDR]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[SHELL]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[SOFT_FAIL]",
    "kind": "local_only",
+   "known": null,
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[SWIFT_PATH]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[SYSTEMD_EXEC_PID]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "—",
    "key": "probe.env_names[TERM]",
    "kind": "local_only",
+   "known": "container-env",
    "local": "present"
   },
   {
    "github": "present",
    "key": "probe.env_names[USER]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[USE_BAZEL_FALLBACK_VERSION]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[VCPKG_INSTALLATION_ROOT]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[XDG_CONFIG_HOME]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "present",
    "key": "probe.env_names[XDG_RUNTIME_DIR]",
    "kind": "github_only",
+   "known": "hosted-image-env",
    "local": "—"
   },
   {
    "github": "workflow_dispatch",
    "key": "probe.expressions.EXPR_EVENT",
    "kind": "differ",
+   "known": "no-events",
    "local": ""
   },
   {
    "github": "main",
    "key": "probe.git.branch",
    "kind": "differ",
-   "local": "d80890bd792808ef4c2aef5b99ce1663f5ec1c9c"
+   "known": "checkout-copy",
+   "local": "068880987f522c3f62ef4bc0d28229ce0812bf72"
   },
   {
-   "github": "12",
+   "github": "14",
    "key": "probe.git.commit_count",
    "kind": "differ",
+   "known": "checkout-copy",
    "local": "1"
   },
   {
-   "github": "github-actions[bot]",
+   "github": "playground050",
    "key": "probe.git.last_commit_author",
    "kind": "differ",
+   "known": "checkout-copy",
    "local": "local-ci"
   },
   {
    "github": "https://github.com/playground050/local-ci-parity",
    "key": "probe.git.remote",
    "kind": "differ",
+   "known": "api-emulation",
    "local": "http://127.0.0.1/playground050/local-ci-parity"
   },
   {
    "github": "true",
    "key": "probe.git.status_clean",
    "kind": "differ",
+   "known": "checkout-copy",
    "local": "false"
   },
   {
    "github": "C.UTF-8",
    "key": "probe.system.locale",
    "kind": "differ",
+   "known": "runner-image",
    "local": ""
   },
   {
    "github": "Ubuntu 26.04.1 LTS",
    "key": "probe.system.os_release",
    "kind": "differ",
+   "known": "runner-image",
    "local": "Ubuntu 24.04.5 LTS"
   },
   {
    "github": "/home/runner/work/local-ci-parity/local-ci-parity",
    "key": "probe.system.workspace",
    "kind": "differ",
+   "known": "work-dir",
    "local": "/home/runner/_work/local-ci-parity/local-ci-parity"
   },
   {
    "github": "ansible [core 2.21.6]",
    "key": "probe.tools.ansible",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   },
   {
    "github": "GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)",
    "key": "probe.tools.bash",
    "kind": "differ",
+   "known": "runner-image",
    "local": "GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)"
   },
   {
    "github": "curl 8.18.0 (x86_64-pc-linux-gnu) libcurl/8.18.0 OpenSSL/3.5.5 zlib/1.3.1 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.68.0 librtmp/2.3 mit-krb5/1.22.1 OpenLDAP/2.6.10",
    "key": "probe.tools.curl",
    "kind": "differ",
+   "known": "runner-image",
    "local": "curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.10"
   },
   {
    "github": "Docker version 29.4.2, build 055a478",
    "key": "probe.tools.docker",
    "kind": "differ",
+   "known": "runner-image",
    "local": "Docker version 29.9.2, build a82e528"
   },
   {
    "github": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
    "key": "probe.tools.gcc",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   },
   {
    "github": "jq-1.8.1",
    "key": "probe.tools.jq",
    "kind": "differ",
+   "known": "runner-image",
    "local": "jq-1.7"
   },
   {
    "github": "GNU Make 4.4.1",
    "key": "probe.tools.make",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   },
   {
    "github": "v24.22.2",
    "key": "probe.tools.node",
    "kind": "differ",
+   "known": "runner-image",
    "local": "v24.22.1"
   },
   {
    "github": "pip 25.1.1 from /usr/lib/python3/dist-packages/pip (python 3.14)",
    "key": "probe.tools.pip3",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   },
   {
    "github": "Python 3.14.4",
    "key": "probe.tools.python3",
    "kind": "differ",
+   "known": "runner-image",
    "local": "Python 3.12.3"
   },
   {
    "github": "rsync  version 3.4.1  protocol version 32",
    "key": "probe.tools.rsync",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   },
   {
    "github": "sudo-rs 0.2.13-0ubuntu1.2",
    "key": "probe.tools.sudo",
    "kind": "differ",
+   "known": "runner-image",
    "local": "Sudo version 1.9.15p5"
   },
   {
    "github": "xz (XZ Utils) 5.8.3",
    "key": "probe.tools.xz",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   },
   {
    "github": "*** Zstandard CLI (64-bit) v1.5.7, by Yann Collet ***",
    "key": "probe.tools.zstd",
    "kind": "differ",
+   "known": "runner-image",
    "local": "null"
   }
  ]
