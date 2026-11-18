@@ -5,14 +5,15 @@ on:
     - cron: "17 0 * * 1"   # 毎週月曜 09:17 JST
   workflow_dispatch:
     inputs:
-      localci_package:
-        description: "npm でインストールする Local CI（例: run-local-ci@0.18.1）"
-        default: "run-local-ci@0.18.1"
+      localci_source:
+        description: "使う Local CI。github:<owner>/<repo>@<branch> でソースからビルド、npm:<package> で npm 版"
+        default: "github:playground050/local-ci@fixes/all"
 permissions:
   contents: read
 env:
   # 入力値は run: に直接埋め込まず、環境変数で渡す（スクリプトへの注入を防ぐ）
-  LCI_PKG: ${{ inputs.localci_package || 'run-local-ci@0.18.1' }}
+  # 毎週の定期実行では、修正を入れた fork を使う
+  LCI_SOURCE: ${{ inputs.localci_source || 'github:playground050/local-ci@fixes/all' }}
 concurrency:
   group: parity-weekly
   cancel-in-progress: false
@@ -35,16 +36,39 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 22
+          node-version: 24
       - name: Install Local CI
-        run: npm install --prefix "$RUNNER_TEMP/lci" --no-audit --no-fund "$LCI_PKG"
+        run: |
+          case "$LCI_SOURCE" in
+            github:*@*)
+              spec="${LCI_SOURCE#github:}"; repo="${spec%%@*}"; ref="${spec#*@}"
+              git clone --quiet --depth 1 --branch "$ref" "https://github.com/$repo.git" "$RUNNER_TEMP/lci-src"
+              cd "$RUNNER_TEMP/lci-src"
+              corepack enable
+              pnpm install --frozen-lockfile
+              # CLI は TypeScript のまま Node で動かす。DTU だけはビルド済みの dist を参照する
+              pnpm --filter dtu-github-actions build
+              printf '#!/bin/sh\nexec node "%s/packages/cli/src/cli.ts" "$@"\n' "$PWD" > "$RUNNER_TEMP/local-ci"
+              echo "$LCI_SOURCE ($(git rev-parse --short HEAD))" > "$RUNNER_TEMP/localci.version"
+              ;;
+            npm:*)
+              npm install --prefix "$RUNNER_TEMP/lci" --no-audit --no-fund "${LCI_SOURCE#npm:}"
+              printf '#!/bin/sh\nexec "%s" "$@"\n' "$RUNNER_TEMP/lci/node_modules/.bin/local-ci" > "$RUNNER_TEMP/local-ci"
+              echo "$LCI_SOURCE" > "$RUNNER_TEMP/localci.version"
+              ;;
+            *)
+              echo "::error::localci_source は github:<owner>/<repo>@<branch> か npm:<package> で指定してください"
+              exit 1
+              ;;
+          esac
+          chmod +x "$RUNNER_TEMP/local-ci"
       - name: Run parity-probe.yml with Local CI
         env:
           GITHUB_REPO: ${{ github.repository }}
         run: |
           # Local CI が失敗・ハングしても比較とレポートまで進めるため、終了コードだけ記録する
           rc=0
-          timeout 900 "$RUNNER_TEMP/lci/node_modules/.bin/local-ci" run \
+          timeout 900 "$RUNNER_TEMP/local-ci" run \
             --workflow .github/workflows/parity-probe.yml --quiet > "$RUNNER_TEMP/localci.out" 2>&1 || rc=$?
           cat "$RUNNER_TEMP/localci.out"
           echo "LOCALCI_EXIT=$rc" >> "$GITHUB_ENV"
@@ -65,6 +89,7 @@ jobs:
             ${{ runner.temp }}/localci.log
             ${{ runner.temp }}/localci.out
             ${{ runner.temp }}/localci.exit
+            ${{ runner.temp }}/localci.version
 
   compare:
     needs: [native, localci]
@@ -100,7 +125,7 @@ jobs:
           {"date": "$DATE", "where": "GitHub Actions (ubuntu-latest, Docker)",
            "commit": "${{ github.sha }}",
            "run": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-           "local_ci": "$LCI_PKG",
+           "local_ci": "$(cat "$RUNNER_TEMP/lci/localci.version" 2>/dev/null || echo "$LCI_SOURCE")",
            "local_ci_exit": "$(cat "$RUNNER_TEMP/lci/localci.exit" 2>/dev/null || echo unknown)"}
           JSON
           PREV=$(ls "$R"/20*.json 2>/dev/null | grep -v "/$DATE.json" | sort | tail -1 || true)
