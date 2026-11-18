@@ -1,0 +1,121 @@
+# 毎週、本物の GitHub Actions と Local CI（Docker）で parity-probe.yml を実行し、違いを reports/gha/ に記録する。
+name: parity-weekly
+on:
+  schedule:
+    - cron: "17 0 * * 1"   # 毎週月曜 09:17 JST
+  workflow_dispatch:
+    inputs:
+      localci_package:
+        description: "npm でインストールする Local CI（例: run-local-ci@0.18.1）"
+        default: "run-local-ci@0.18.1"
+permissions:
+  contents: read
+env:
+  # 入力値は run: に直接埋め込まず、環境変数で渡す（スクリプトへの注入を防ぐ）
+  LCI_PKG: ${{ inputs.localci_package || 'run-local-ci@0.18.1' }}
+concurrency:
+  group: parity-weekly
+  cancel-in-progress: false
+
+jobs:
+  native:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/parity-probe.yml
+
+  localci:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Install Local CI
+        run: npm install --prefix "$RUNNER_TEMP/lci" --no-audit --no-fund "$LCI_PKG"
+      - name: Run parity-probe.yml with Local CI
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+        run: |
+          # Local CI が失敗・ハングしても比較とレポートまで進めるため、終了コードだけ記録する
+          rc=0
+          timeout 900 "$RUNNER_TEMP/lci/node_modules/.bin/local-ci" run \
+            --workflow .github/workflows/parity-probe.yml --quiet > "$RUNNER_TEMP/localci.out" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/localci.out"
+          echo "LOCALCI_EXIT=$rc" >> "$GITHUB_ENV"
+      - name: Collect Local CI step logs
+        if: always()
+        run: |
+          : > "$RUNNER_TEMP/localci.log"
+          for d in $(grep -o 'Logs: .*' "$RUNNER_TEMP/localci.out" | sed 's/^Logs: //'); do
+            cat "$d"/steps/*.log >> "$RUNNER_TEMP/localci.log" 2>/dev/null || true
+          done
+          echo "${LOCALCI_EXIT:-unknown}" > "$RUNNER_TEMP/localci.exit"
+          grep -c "PARITY-JSON" "$RUNNER_TEMP/localci.log" || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: localci-logs
+          path: |
+            ${{ runner.temp }}/localci.log
+            ${{ runner.temp }}/localci.out
+            ${{ runner.temp }}/localci.exit
+
+  compare:
+    needs: [native, localci]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      # レポートを push するので、このジョブだけは認証情報を残す（成果物はアップロードしない）
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: localci-logs
+          path: ${{ runner.temp }}/lci
+      - name: Fetch native job logs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          : > "$RUNNER_TEMP/github.log"
+          for id in $(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs" \
+                        --jq '.jobs[] | select(.name | startswith("native")) | .id'); do
+            gh api "repos/${{ github.repository }}/actions/jobs/$id/logs" >> "$RUNNER_TEMP/github.log"
+          done
+          grep -c "PARITY-JSON" "$RUNNER_TEMP/github.log" || true
+      - name: Compare and write report
+        run: |
+          DATE=$(date -u +%F); R=reports/gha; mkdir -p "$R"
+          cat > "$RUNNER_TEMP/meta.json" <<JSON
+          {"date": "$DATE", "where": "GitHub Actions (ubuntu-latest, Docker)",
+           "commit": "${{ github.sha }}",
+           "run": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+           "local_ci": "$LCI_PKG",
+           "local_ci_exit": "$(cat "$RUNNER_TEMP/lci/localci.exit" 2>/dev/null || echo unknown)"}
+          JSON
+          PREV=$(ls "$R"/20*.json 2>/dev/null | grep -v "/$DATE.json" | sort | tail -1 || true)
+          python3 .github/parity/compare.py "$RUNNER_TEMP/github.log" "$RUNNER_TEMP/lci/localci.log" \
+            --meta "$RUNNER_TEMP/meta.json" --json "$R/$DATE.json" ${PREV:+--prev "$PREV"} > "$R/$DATE.md"
+          cp "$R/$DATE.md" "$R/latest.md"
+          [ -f "$R/history.csv" ] || echo "date,differ,github_only,local_only,same,local_ci_exit" > "$R/history.csv"
+          grep -v "^$DATE," "$R/history.csv" > "$R/history.tmp" && mv "$R/history.tmp" "$R/history.csv"
+          python3 -c "import json,sys; d=json.load(open(sys.argv[1])); c=d['counts']; print(f\"{d['meta']['date']},{c['differ']},{c['github_only']},{c['local_only']},{c['same']},{d['meta']['local_ci_exit']}\")" "$R/$DATE.json" >> "$R/history.csv"
+          cat "$R/$DATE.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/gha
+          git diff --cached --quiet && exit 0
+          git commit -m "report: parity (GitHub Actions) $(date -u +%F) [skip ci]"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done
+          exit 1

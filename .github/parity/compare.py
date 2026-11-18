@@ -1,0 +1,124 @@
+"""GitHub と Local CI のログから PARITY-JSON を取り出し、違いを Markdown で出す。
+
+使い方:
+  python3 compare.py github.log localci.log --meta meta.json \
+      --json out.json [--prev previous.json] [--redact TEXT ...] > report.md
+"""
+import argparse, base64, datetime, json, re
+
+# 実行ごとに変わるのが当然で、違いとして数えないもの
+VOLATILE = re.compile(
+    r"(run_id|run_number|run_attempt|job_id|check_run_id|workflow_sha|retention_days|"
+    r"\.id$|_id$|timestamp|started_at|ACTIONS_RUNTIME_URL|ACTIONS_RESULTS_URL|ACTIONS_CACHE_URL|"
+    r"ACTIONS_ID_TOKEN_REQUEST_URL|RUNNER_NAME|RUNNER_TRACKING_ID|GITHUB_RUN_|GITHUB_JOB_ID|"
+    r"INVOCATION_ID|JOURNAL_STREAM|HOSTNAME|disk_free_gb|mem_gb)",
+    re.I,
+)
+MARK = re.compile(r"PARITY-JSON (\S+) ([A-Za-z0-9+/=]{20,})")
+LABELS = {"differ": "値が違う", "github_only": "GitHub にだけある", "local_only": "Local CI にだけある"}
+
+
+def extract(path):
+    out = {}
+    with open(path, errors="replace") as f:
+        for line in f:
+            m = MARK.search(line)
+            if m:
+                out[m.group(1)] = json.loads(base64.b64decode(m.group(2)))
+    return out
+
+
+def flatten(obj, prefix=""):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            yield from flatten(v, f"{prefix}.{k}" if prefix else k)
+    elif isinstance(obj, list) and prefix.endswith("env_names"):
+        for name in obj:
+            yield f"{prefix}[{name}]", "present"
+    else:
+        yield prefix, obj
+
+
+def redact(v, words):
+    s = json.dumps(v, ensure_ascii=False) if not isinstance(v, str) else v
+    for w in words:
+        if w:
+            s = s.replace(w, "<redacted>")
+    return s
+
+
+def cell(s, n=70):
+    s = s.replace("|", "\\|").replace("\n", " ")
+    return (s[: n - 1] + "…") if len(s) > n else (s or '""')
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("github_log"); ap.add_argument("localci_log")
+    ap.add_argument("--meta"); ap.add_argument("--json"); ap.add_argument("--prev")
+    ap.add_argument("--redact", nargs="*", default=[])
+    a = ap.parse_args()
+    gh, lc = extract(a.github_log), extract(a.localci_log)
+    meta = json.load(open(a.meta)) if a.meta else {}
+    rows, counts = [], {"differ": 0, "github_only": 0, "local_only": 0, "same": 0, "ignored": 0}
+    for job in sorted(set(gh) | set(lc)):
+        x, y = dict(flatten(gh.get(job, {}))), dict(flatten(lc.get(job, {})))
+        for key in sorted(set(x) | set(y)):
+            if VOLATILE.search(key):
+                counts["ignored"] += 1
+                continue
+            if key in x and key in y:
+                if x[key] == y[key]:
+                    counts["same"] += 1
+                    continue
+                kind = "differ"
+            else:
+                kind = "github_only" if key in x else "local_only"
+            counts[kind] += 1
+            rows.append({"kind": kind, "key": f"{job}.{key}",
+                         "github": redact(x.get(key, "—"), a.redact),
+                         "local": redact(y.get(key, "—"), a.redact)})
+
+    missing = [j for j in ("probe", "dependent") if j not in gh or j not in lc]
+    result = {"meta": meta, "counts": counts, "missing_jobs": missing, "rows": rows}
+    if a.json:
+        json.dump(result, open(a.json, "w"), ensure_ascii=False, indent=1, sort_keys=True)
+
+    print(f"# Local CI parity report {meta.get('date') or datetime.date.today().isoformat()}\n")
+    for k, v in meta.items():
+        if k != "date":
+            print(f"- {k}: {v}")
+    print(f"\n違い {counts['differ']}、GitHub のみ {counts['github_only']}、Local CI のみ "
+          f"{counts['local_only']}、一致 {counts['same']}（実行ごとに変わる {counts['ignored']} 項目は除外）\n")
+    if missing:
+        print(f"> 注意: 次のジョブの結果が片方にない: {', '.join(missing)}\n")
+
+    if a.prev:
+        try:
+            prev = json.load(open(a.prev))
+            key = lambda r: (r["kind"], r["key"], r["github"], r["local"])  # noqa: E731
+            old, new = {key(r) for r in prev["rows"]}, {key(r) for r in rows}
+            added, gone = sorted(new - old), sorted(old - new)
+            print(f"## 前回（{prev['meta'].get('date', '?')}）からの変化\n")
+            if not added and not gone:
+                print("変化なし。\n")
+            for title, items in (("新しく出た違い", added), ("解消した違い", gone)):
+                if items:
+                    print(f"**{title}（{len(items)}）**\n\n| 種類 | 項目 | GitHub | Local CI |\n| --- | --- | --- | --- |")
+                    for k, key_, g, l in items:
+                        print(f"| {LABELS[k]} | `{key_}` | {cell(g)} | {cell(l)} |")
+                    print()
+        except (OSError, KeyError, json.JSONDecodeError) as e:
+            print(f"> 前回の結果を読めなかった: {e}\n")
+
+    for kind in ("differ", "github_only", "local_only"):
+        sel = [r for r in rows if r["kind"] == kind]
+        if sel:
+            print(f"## {LABELS[kind]}（{len(sel)}）\n\n| 項目 | GitHub | Local CI |\n| --- | --- | --- |")
+            for r in sel:
+                print(f"| `{r['key']}` | {cell(r['github'])} | {cell(r['local'])} |")
+            print()
+
+
+if __name__ == "__main__":
+    main()

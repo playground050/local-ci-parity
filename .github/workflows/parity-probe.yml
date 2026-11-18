@@ -1,0 +1,56 @@
+# 本物の GitHub Actions と Local CI の違いを記録するための調査用 workflow。
+# 同じ内容を両方で実行し、ログに出した PARITY-JSON 行を比べる。
+name: parity-probe
+on:
+  workflow_dispatch:
+  # parity-weekly.yml から「本物」として呼び出す
+  workflow_call:
+  push:
+    branches: [main]
+    # 毎週のレポートのコミットでは動かさない
+    paths-ignore:
+      - "reports/**"
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    outputs:
+      answer: ${{ steps.out.outputs.answer }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: out
+        name: step output
+        run: echo "answer=42" >> "$GITHUB_OUTPUT"
+      - id: soft-fail
+        name: continue-on-error step
+        continue-on-error: true
+        run: exit 3
+      - name: probe
+        env:
+          CTX_GITHUB: ${{ toJSON(github) }}
+          CTX_RUNNER: ${{ toJSON(runner) }}
+          CTX_JOB: ${{ toJSON(job) }}
+          CTX_STEPS: ${{ toJSON(steps) }}
+          EXPR_SHA: ${{ github.sha }}
+          EXPR_REF_NAME: ${{ github.ref_name }}
+          EXPR_EVENT: ${{ github.event_name }}
+          EXPR_SOFT_FAIL: ${{ steps.soft-fail.outcome }}/${{ steps.soft-fail.conclusion }}
+        run: python3 .github/parity/probe.py probe
+  dependent:
+    needs: probe
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe needs
+        env:
+          CTX_NEEDS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {"needs": json.loads(os.environ["CTX_NEEDS"])}
+          print("PARITY-JSON dependent " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
