@@ -1,0 +1,57 @@
+# parity-probe.yml の reusable job から呼ばれる。inputs の型・既定値と outputs を記録する。
+name: parity-reusable
+on:
+  workflow_call:
+    inputs:
+      text:
+        type: string
+        required: true
+      number:
+        type: number
+        required: true
+      flag:
+        type: boolean
+        default: false
+      defaulted:
+        type: string
+        default: def-value
+      defaulted-number:
+        type: number
+        default: 3
+    outputs:
+      echoed:
+        value: ${{ jobs.inner.outputs.echoed }}
+      number:
+        value: ${{ jobs.inner.outputs.number }}
+permissions:
+  contents: read
+jobs:
+  inner:
+    runs-on: ubuntu-latest
+    outputs:
+      echoed: ${{ steps.out.outputs.echoed }}
+      number: ${{ steps.out.outputs.number }}
+    steps:
+      - id: out
+        name: set outputs
+        env:
+          TEXT: ${{ inputs.text }}
+          NUMBER: ${{ inputs.number }}
+        run: |
+          echo "echoed=$TEXT-$NUMBER" >> "$GITHUB_OUTPUT"
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+      - name: probe inputs
+        env:
+          CTX_INPUTS: ${{ toJSON(inputs) }}
+          NUMBER_IS_NUMBER: ${{ inputs.number == 7 }}
+          FLAG_IS_BOOL: ${{ inputs.flag == true }}
+          DEFAULT_NUM_SUM_STR: ${{ format('{0}', inputs.defaulted-number) }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {"inputs": json.loads(os.environ["CTX_INPUTS"]),
+                  "number_eq_7": os.environ["NUMBER_IS_NUMBER"],
+                  "flag_eq_true": os.environ["FLAG_IS_BOOL"],
+                  "defaulted_number": os.environ["DEFAULT_NUM_SUM_STR"]}
+          print("PARITY-JSON reusable-inner " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY

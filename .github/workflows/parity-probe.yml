@@ -219,3 +219,226 @@ jobs:
           OUTCOMES: ${{ toJSON(steps) }}
           LEG_NAME: ${{ matrix.flag }}
         run: python3 .github/parity/emit.py "step-if-$LEG_NAME" OUTCOMES
+
+  # ── 式の関数と演算子 ────────────────────────────────────────────────────
+  # 大文字小文字の扱い、型の変換、format の波かっこ、オブジェクトのフィルタ（.*）など
+  expressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: probe expression functions
+        env:
+          F_CONTAINS: ${{ contains('Hello', 'ell') }}
+          F_CONTAINS_ARRAY_CI: ${{ contains(fromJSON('["a","b"]'), 'B') }}
+          F_STARTS_CI: ${{ startsWith('Hello', 'he') }}
+          F_ENDS_CI: ${{ endsWith('Hello', 'LO') }}
+          F_FORMAT: ${{ format('{0}-{1}-{{x}}', 'a', 1) }}
+          F_JOIN: ${{ join(fromJSON('["a","b"]'), '+') }}
+          F_STR_NUM_EQ: ${{ '1' == 1 }}
+          F_STR_CI_EQ: ${{ 'ABC' == 'abc' }}
+          F_BOOL_NUM_EQ: ${{ true == 1 }}
+          F_OR_FALLBACK: ${{ '' || 'fallback' }}
+          F_AND_LAST: ${{ 'x' && 'y' }}
+          F_NULL_EQ: ${{ fromJSON('{"k":null}').k == null }}
+          F_NOT_ZERO: ${{ !0 }}
+          F_LESS_STR: ${{ 'a' < 'B' }}
+          F_NUMBER_FMT: ${{ 1.50 }}
+          F_HEX: ${{ 0xff }}
+          F_INDEX: ${{ fromJSON('{"k":[10,20]}').k[1] }}
+          F_FILTER: ${{ toJSON(fromJSON('[{"n":1},{"n":2},{"m":3}]').*.n) }}
+          F_TOJSON_TYPES: ${{ toJSON(fromJSON('{"a":1.0,"b":true,"c":null,"d":"s"}')) }}
+          F_HASH: ${{ hashFiles('.github/parity/emit.py') }}
+          F_HASH_MULTI: ${{ hashFiles('.github/parity/emit.py', '.github/parity/probe.py') }}
+          F_HASH_NONE: ${{ hashFiles('no-such-file-*') }}
+        run: >-
+          python3 .github/parity/emit.py expressions
+          F_CONTAINS F_CONTAINS_ARRAY_CI F_STARTS_CI F_ENDS_CI F_FORMAT F_JOIN
+          F_STR_NUM_EQ F_STR_CI_EQ F_BOOL_NUM_EQ F_OR_FALLBACK F_AND_LAST F_NULL_EQ F_NOT_ZERO
+          F_LESS_STR F_NUMBER_FMT F_HEX F_INDEX F_FILTER F_TOJSON_TYPES F_HASH F_HASH_MULTI F_HASH_NONE
+
+  # ── GITHUB_ENV / GITHUB_PATH、env の優先順位、defaults.run、shell ─────────
+  env-files:
+    runs-on: ubuntu-latest
+    env:
+      LEVEL: job
+      JOB_ONLY: from-job
+    defaults:
+      run:
+        working-directory: .github
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: write env files
+        run: |
+          echo "FROM_ENV=one" >> "$GITHUB_ENV"
+          echo "LEVEL=github-env" >> "$GITHUB_ENV"
+          {
+            echo "MULTI<<PARITY_EOF"
+            echo "line 1"
+            echo "line 2"
+            echo "PARITY_EOF"
+          } >> "$GITHUB_ENV"
+          mkdir -p "$HOME/parity-bin"
+          printf '#!/bin/sh\necho tool-on-path\n' > "$HOME/parity-bin/parity-tool"
+          chmod +x "$HOME/parity-bin/parity-tool"
+          echo "$HOME/parity-bin" >> "$GITHUB_PATH"
+      - name: probe env files
+        env:
+          STEP_ONLY: from-step
+          CTX_FROM_ENV: ${{ env.FROM_ENV }}
+          CTX_LEVEL: ${{ env.LEVEL }}
+          CTX_JOB_ONLY: ${{ env.JOB_ONLY }}
+        run: |
+          export PWD_NAME="$(basename "$PWD")"
+          export TOOL_OUT="$(parity-tool 2>&1 || echo missing)"
+          python3 parity/emit.py env-files FROM_ENV LEVEL MULTI JOB_ONLY STEP_ONLY \
+            CTX_FROM_ENV CTX_LEVEL CTX_JOB_ONLY PWD_NAME TOOL_OUT
+      - name: probe step env over GITHUB_ENV
+        env:
+          LEVEL: step
+        run: python3 parity/emit.py env-files-step-wins LEVEL
+      - name: probe shell python
+        shell: python
+        run: |
+          import base64, json, os, sys
+          data = {"cwd_name": os.path.basename(os.getcwd()), "from_env": os.environ.get("FROM_ENV"),
+                  "is_python": sys.version_info[0] == 3}
+          print("PARITY-JSON shell-python " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+      - name: probe shell sh
+        shell: sh
+        working-directory: .
+        run: |
+          set -- a b
+          export ARGC="$#" PWD_NAME="$(basename "$PWD")"
+          python3 .github/parity/emit.py shell-sh ARGC PWD_NAME
+
+  # ── services（サイドカーのコンテナ） ──────────────────────────────────────
+  # job.services の中身と、ホスト名・公開ポートのどちらで届くかを記録する
+  services:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379
+        env:
+          PARITY_SERVICE_ENV: set
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 15
+    steps:
+      - name: probe service container
+        env:
+          SVC: ${{ toJSON(job.services) }}
+          MAPPED_PORT: ${{ job.services.redis.ports['6379'] }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, socket
+          def ping(host, port):
+              try:
+                  with socket.create_connection((host, int(port)), timeout=5) as s:
+                      s.sendall(b"PING\r\n")
+                      return s.recv(16).decode().strip()
+              except Exception as e:
+                  return type(e).__name__
+          svc = json.loads(os.environ["SVC"] or "{}")
+          port = os.environ["MAPPED_PORT"]
+          redis = svc.get("redis", {})
+          data = {
+              "names": sorted(svc),
+              "fields": sorted(redis),
+              "has_mapped_port": bool(port),
+              "port_differs_from_container": bool(port) and port != "6379",
+              "has_network": bool(redis.get("network")),
+              "via_localhost_mapped": ping("localhost", port) if port else "no-port",
+              "via_hostname": ping("redis", 6379),
+          }
+          print("PARITY-JSON services " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
+
+  # ── actions/cache（同じ run の中で保存して別の job で戻す） ─────────────
+  cache-save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: make cache content
+        run: mkdir -p .parity-cache && echo "cached-content" > .parity-cache/value
+      - id: cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .parity-cache
+          key: parity-cache-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: probe cache miss
+        env:
+          HIT: ${{ steps.cache.outputs.cache-hit }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {"first_hit": os.environ["HIT"]}
+          print("PARITY-JSON cache-save " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
+  cache-restore:
+    needs: cache-save
+    runs-on: ubuntu-latest
+    steps:
+      - id: exact
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .parity-cache
+          key: parity-cache-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: read exact
+        run: echo "EXACT_VALUE=$(cat .parity-cache/value 2>/dev/null || echo missing)" >> "$GITHUB_ENV" && rm -rf .parity-cache
+      - id: prefix
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .parity-cache
+          key: parity-no-such-key-${{ github.run_id }}
+          restore-keys: parity-cache-${{ github.run_id }}-
+      - id: miss
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .parity-miss
+          key: parity-never-saved-${{ github.run_id }}
+      - name: probe cache restore
+        env:
+          EXACT_HIT: ${{ steps.exact.outputs.cache-hit }}
+          EXACT_MATCH_OK: ${{ steps.exact.outputs.cache-matched-key == format('parity-cache-{0}-{1}', github.run_id, github.run_attempt) }}
+          PREFIX_HIT: ${{ steps.prefix.outputs.cache-hit }}
+          PREFIX_MATCH_OK: ${{ steps.prefix.outputs.cache-matched-key == format('parity-cache-{0}-{1}', github.run_id, github.run_attempt) }}
+          MISS_HIT: ${{ steps.miss.outputs.cache-hit }}
+          MISS_MATCHED: ${{ steps.miss.outputs.cache-matched-key }}
+        run: |
+          export PREFIX_VALUE="$(cat .parity-cache/value 2>/dev/null || echo missing)"
+          python3 - <<'PY'
+          import base64, json, os
+          names = ["EXACT_HIT", "EXACT_MATCH_OK", "EXACT_VALUE", "PREFIX_HIT", "PREFIX_MATCH_OK",
+                   "PREFIX_VALUE", "MISS_HIT", "MISS_MATCHED"]
+          data = {n: os.environ.get(n) for n in names}
+          print("PARITY-JSON cache-restore " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
+
+  # ── 再利用ワークフロー（inputs の型と既定値、outputs） ───────────────────
+  reusable:
+    uses: ./.github/workflows/parity-reusable.yml
+    with:
+      text: hello
+      number: 7
+      flag: true
+  after-reusable:
+    needs: reusable
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe outputs of a reusable workflow
+        env:
+          CTX_NEEDS: ${{ toJSON(needs) }}
+          NUMBER_PLUS: ${{ needs.reusable.outputs.number == 7 }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {"needs": json.loads(os.environ["CTX_NEEDS"]), "number_eq_7": os.environ["NUMBER_PLUS"]}
+          print("PARITY-JSON after-reusable " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
