@@ -83,6 +83,10 @@ def main():
     ap.add_argument("--redact", nargs="*", default=[])
     a = ap.parse_args()
     gh, lc = extract(a.github_log), extract(a.localci_log)
+    # 片方に結果がまったくないときは比べられない。「要確認 0」と出さずに失敗させる
+    for name, found in (("GitHub", gh), ("Local CI", lc)):
+        if not [k for k in found if k != "_broken"]:
+            raise SystemExit(f"{name} のログに PARITY-JSON がない（実行に失敗した可能性）。比較を中止")
     meta = json.load(open(a.meta)) if a.meta else {}
     rows, counts = [], {"differ": 0, "github_only": 0, "local_only": 0, "same": 0, "ignored": 0}
     broken = {"github": gh.pop("_broken", {}), "local": lc.pop("_broken", {})}
