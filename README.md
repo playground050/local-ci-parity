@@ -18,6 +18,7 @@
 - `.github/workflows/parity-probe.yml` … 調査用 workflow（本物と Local CI の両方で実行）
 - `.github/workflows/parity-weekly.yml` … GitHub Actions での毎週の比較
 - `.github/parity/probe.py` … 環境を調べて `PARITY-JSON` 行を出す
+- `.github/parity/emit.py` … 環境変数の値を `PARITY-JSON` 行として出す（matrix などの小さな記録用）
 - `.github/parity/compare.py` … 2 つのログを比べて Markdown のレポートを作る
 - `.github/parity/known.json` … 既知の違いの一覧（項目名の正規表現と理由）
 - `.github/local-ci.Dockerfile` … Local CI の runner イメージに python3 を足す

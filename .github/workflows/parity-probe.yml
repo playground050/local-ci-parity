@@ -92,3 +92,95 @@ jobs:
           data = {"needs": json.loads(os.environ["CTX_NEEDS"])}
           print("PARITY-JSON after-soft-job " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
           PY
+
+  # ── matrix ──────────────────────────────────────────────────────────────
+  # 直積、exclude、include（既存の組み合わせへの追加と新しい組み合わせ）、
+  # matrix / strategy コンテキスト。組み合わせごとに別のラベルで記録する
+  matrix-basic:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        size: [small, large]
+        mode: [fast, slow]
+        exclude:
+          - size: large
+            mode: slow
+        include:
+          - size: small
+            mode: fast
+            extra: added-by-include
+          - size: huge
+            mode: fast
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: probe matrix leg
+        env:
+          CTX_MATRIX: ${{ toJSON(matrix) }}
+          CTX_STRATEGY: ${{ toJSON(strategy) }}
+          LEG_NAME: ${{ matrix.size }}-${{ matrix.mode }}
+        run: python3 .github/parity/emit.py "matrix-$LEG_NAME" CTX_MATRIX CTX_STRATEGY
+
+  # 前の job の出力から作る matrix（fromJSON）
+  matrix-source:
+    runs-on: ubuntu-latest
+    outputs:
+      colors: ${{ steps.colors.outputs.colors }}
+    steps:
+      - id: colors
+        name: list colors
+        run: echo 'colors=["red","blue"]' >> "$GITHUB_OUTPUT"
+  matrix-dynamic:
+    needs: matrix-source
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        color: ${{ fromJSON(needs.matrix-source.outputs.colors) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: probe dynamic leg
+        env:
+          CTX_MATRIX: ${{ toJSON(matrix) }}
+          LEG_NAME: ${{ matrix.color }}
+        run: python3 .github/parity/emit.py "matrix-dynamic-$LEG_NAME" CTX_MATRIX
+
+  # 一部の組み合わせだけ失敗を許す（job の continue-on-error を matrix の式で指定）
+  matrix-experimental:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        experimental: [false, true]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: probe experimental leg
+        env:
+          CTX_MATRIX: ${{ toJSON(matrix) }}
+          LEG_NAME: ${{ matrix.experimental }}
+        run: python3 .github/parity/emit.py "matrix-experimental-$LEG_NAME" CTX_MATRIX
+      - name: fail the experimental leg
+        if: matrix.experimental
+        run: exit 5
+
+  # matrix の job を待つ job から見た結果（outputs は最後に終わった組み合わせで決まるので記録しない）
+  matrix-after:
+    needs: [matrix-basic, matrix-dynamic, matrix-experimental]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: probe needs of matrix jobs
+        env:
+          RESULT_BASIC: ${{ needs.matrix-basic.result }}
+          RESULT_DYNAMIC: ${{ needs.matrix-dynamic.result }}
+          RESULT_EXPERIMENTAL: ${{ needs.matrix-experimental.result }}
+        run: python3 .github/parity/emit.py matrix-after RESULT_BASIC RESULT_DYNAMIC RESULT_EXPERIMENTAL
