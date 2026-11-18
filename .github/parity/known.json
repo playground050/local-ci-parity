@@ -99,12 +99,33 @@
       ]
     },
     {
-      "id": "job-steps-context",
-      "reason": "job / steps コンテキスト（job.status、steps.*.outcome など）は未対応（run: や env: の中では実行前に空へ置き換わる）",
-      "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md#expressions--",
+      "id": "job-workflow-fields",
+      "reason": "job コンテキストの workflow_file_path / workflow_ref / workflow_repository（呼び出された workflow の情報）は Local CI では未設定",
       "keys": [
-        "probe\\.contexts\\.(job|steps)(\\.|$)",
-        "after-soft-fail\\.(job_status|soft_fail)$"
+        "probe\\.contexts\\.job\\.workflow_(file_path|ref|repository)$"
+      ],
+      "kinds": [
+        "github_only"
+      ]
+    },
+    {
+      "id": "reusable-call",
+      "reason": "本物では parity-probe.yml を parity-weekly.yml から呼び出す（workflow_call）ため、github.workflow は呼び出し元になる。Local CI では parity-probe.yml を直接実行している（比べ方の違いで、Local CI の問題ではない）",
+      "kinds": [
+        "differ"
+      ],
+      "keys": [
+        "probe\\.env_github\\.GITHUB_WORKFLOW(_REF)?$"
+      ]
+    },
+    {
+      "id": "numeric-ids",
+      "reason": "リポジトリやユーザーの数値 ID（GITHUB_REPOSITORY_ID など）は手元では分からない",
+      "kinds": [
+        "github_only"
+      ],
+      "keys": [
+        "probe\\.env_(names\\[|github\\.)(GITHUB_ACTOR_ID|GITHUB_REPOSITORY_ID|GITHUB_REPOSITORY_OWNER_ID)\\]?$"
       ]
     }
   ]
