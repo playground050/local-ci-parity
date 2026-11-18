@@ -184,3 +184,38 @@ jobs:
           RESULT_DYNAMIC: ${{ needs.matrix-dynamic.result }}
           RESULT_EXPERIMENTAL: ${{ needs.matrix-experimental.result }}
         run: python3 .github/parity/emit.py matrix-after RESULT_BASIC RESULT_DYNAMIC RESULT_EXPERIMENTAL
+
+  # step の if: は runner が実行中に評価する。matrix / needs / strategy を読む条件で
+  # 実行されたかどうか（steps.<id>.outcome が success か skipped か）を記録する
+  step-if:
+    needs: matrix-source
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flag: [false, true]
+        name: [alpha]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: if-matrix-bool
+        if: matrix.flag
+        run: echo ran
+      - id: if-matrix-eq
+        if: matrix.name == 'alpha'
+        run: echo ran
+      - id: if-needs-output
+        if: needs.matrix-source.outputs.colors != ''
+        run: echo ran
+      - id: if-needs-result
+        if: needs.matrix-source.result == 'success'
+        run: echo ran
+      - id: if-strategy
+        if: strategy.job-total == 2
+        run: echo ran
+      - name: probe step if outcomes
+        if: always()
+        env:
+          OUTCOMES: ${{ toJSON(steps) }}
+          LEG_NAME: ${{ matrix.flag }}
+        run: python3 .github/parity/emit.py "step-if-$LEG_NAME" OUTCOMES
