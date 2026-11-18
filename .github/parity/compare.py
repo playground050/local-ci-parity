@@ -2,9 +2,15 @@
 
 使い方:
   python3 compare.py github.log localci.log --meta meta.json \
-      --json out.json [--prev previous.json] [--redact TEXT ...] > report.md
+      --json out.json [--prev previous.json] [--history history.csv] \
+      [--known known.json] [--redact TEXT ...] > report.md
+
+仕様として分かっている違い（known.json）は「既知」に分け、それ以外を「要確認」として先に出す。
 """
-import argparse, base64, datetime, json, re, zlib
+import argparse, base64, csv, datetime, json, os, re, zlib
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+HISTORY_FIELDS = ["date", "unexpected", "known", "differ", "github_only", "local_only", "same", "local_ci_exit"]
 
 # 実行ごとに変わるのが当然で、違いとして数えないもの
 VOLATILE = re.compile(
@@ -70,6 +76,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("github_log"); ap.add_argument("localci_log")
     ap.add_argument("--meta"); ap.add_argument("--json"); ap.add_argument("--prev")
+    ap.add_argument("--known", help="既知の違いの定義（既定: このスクリプトと同じ場所の known.json）")
+    ap.add_argument("--history", help="件数を追記する history.csv")
     ap.add_argument("--redact", nargs="*", default=[])
     a = ap.parse_args()
     gh, lc = extract(a.github_log), extract(a.localci_log)
@@ -96,49 +104,136 @@ def main():
                          "local": redact(y.get(key, "—"), a.redact)})
 
     missing = {"github_only": sorted(set(gh) - set(lc)), "local_only": sorted(set(lc) - set(gh))}
+    rules = load_known(a.known)
+    for r in rows:
+        rule = classify(r, rules)
+        r["known"] = rule["id"] if rule else None
+    counts["known"] = sum(1 for r in rows if r["known"])
+    counts["unexpected"] = len(rows) - counts["known"]
     result = {"meta": meta, "counts": counts, "missing_jobs": missing, "broken": broken, "rows": rows}
     if a.json:
         json.dump(result, open(a.json, "w"), ensure_ascii=False, indent=1, sort_keys=True)
+    if a.history:
+        update_history(a.history, result)
+    render(result, rules, a.prev)
 
+
+def load_known(path):
+    path = path or os.path.join(HERE, "known.json")
+    try:
+        rules = json.load(open(path))["rules"]
+    except (OSError, KeyError, json.JSONDecodeError):
+        return []
+    for rule in rules:
+        rule["_keys"] = [re.compile(k) for k in rule["keys"]]
+        rule["_normalize"] = [(re.compile(p), r) for p, r in rule.get("normalize", [])]
+    return rules
+
+
+def classify(row, rules):
+    """当てはまる既知の違いのルールを返す（最初に当てはまったもの）。なければ None。"""
+    for rule in rules:
+        if rule.get("kinds") and row["kind"] not in rule["kinds"]:
+            continue
+        if not any(k.match(row["key"]) for k in rule["_keys"]):
+            continue
+        if rule["_normalize"]:
+            def norm(v):
+                for p, r in rule["_normalize"]:
+                    v = p.sub(r, v)
+                return v
+            if norm(row["github"]) != norm(row["local"]):
+                continue
+        return rule
+    return None
+
+
+def update_history(path, result):
+    """history.csv に今回の件数を書く。同じ日の行は置き換え、古い形式の列も読み替える。"""
+    c, meta = result["counts"], result["meta"]
+    date = meta.get("date") or datetime.date.today().isoformat()
+    rows = []
+    if os.path.exists(path):
+        with open(path, newline="") as f:
+            rows = [r for r in csv.DictReader(f) if r.get("date") != date]
+    rows.append({"date": date, "unexpected": c["unexpected"], "known": c["known"], "differ": c["differ"],
+                 "github_only": c["github_only"], "local_only": c["local_only"], "same": c["same"],
+                 "local_ci_exit": meta.get("local_ci_exit", "")})
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=HISTORY_FIELDS, extrasaction="ignore", restval="")
+        w.writeheader()
+        w.writerows(sorted(rows, key=lambda r: r["date"]))
+
+
+def table(rows, with_kind=True):
+    head = "| 種類 | 項目 | GitHub | Local CI |\n| --- | --- | --- | --- |" if with_kind \
+        else "| 項目 | GitHub | Local CI |\n| --- | --- | --- |"
+    lines = [head]
+    for r in rows:
+        kind = f"{LABELS[r['kind']]} | " if with_kind else ""
+        lines.append(f"| {kind}`{r['key']}` | {cell(r['github'])} | {cell(r['local'])} |")
+    return "\n".join(lines) + "\n"
+
+
+def render(result, rules, prev_path):
+    meta, counts, rows = result["meta"], result["counts"], result["rows"]
     print(f"# Local CI parity report {meta.get('date') or datetime.date.today().isoformat()}\n")
     for k, v in meta.items():
         if k != "date":
             print(f"- {k}: {v}")
-    print(f"\n違い {counts['differ']}、GitHub のみ {counts['github_only']}、Local CI のみ "
-          f"{counts['local_only']}、一致 {counts['same']}（実行ごとに変わる {counts['ignored']} 項目は除外）\n")
-    for side, jobs in missing.items():
+    print(f"\n**要確認 {counts['unexpected']}** ／ 既知の違い {counts['known']} ／ 一致 {counts['same']}"
+          f"（実行ごとに変わる {counts['ignored']} 項目は除外）\n")
+    for side, jobs in result["missing_jobs"].items():
         if jobs:
             print(f"> 注意: {LABELS[side]}ジョブ結果（比較から除外）: {', '.join(jobs)}\n")
-    for side, items in broken.items():
+    for side, items in result["broken"].items():
         for label, why in items.items():
             print(f"> 注意: {'GitHub' if side == 'github' else 'Local CI'} の `{label}` を読めなかった: {why}\n")
 
-    if a.prev:
+    if prev_path:
         try:
-            prev = json.load(open(a.prev))
+            prev = json.load(open(prev_path))
             key = lambda r: (r["kind"], r["key"], r["github"], r["local"])  # noqa: E731
-            old, new = {key(r) for r in prev["rows"]}, {key(r) for r in rows}
-            added, gone = sorted(new - old), sorted(old - new)
+            old, new = {key(r): r for r in prev["rows"]}, {key(r): r for r in rows}
+            added = [new[k] for k in sorted(set(new) - set(old))]
+            gone = [old[k] for k in sorted(set(old) - set(new))]
             print(f"## 前回（{prev['meta'].get('date', '?')}）からの変化\n")
             if not added and not gone:
                 print("変化なし。\n")
             for title, items in (("新しく出た違い", added), ("解消した違い", gone)):
                 if items:
-                    print(f"**{title}（{len(items)}）**\n\n| 種類 | 項目 | GitHub | Local CI |\n| --- | --- | --- | --- |")
-                    for k, key_, g, l in items:
-                        print(f"| {LABELS[k]} | `{key_}` | {cell(g)} | {cell(l)} |")
-                    print()
+                    print(f"**{title}（{len(items)}）**\n")
+                    print(table(items))
         except (OSError, KeyError, json.JSONDecodeError) as e:
             print(f"> 前回の結果を読めなかった: {e}\n")
 
-    for kind in ("differ", "github_only", "local_only"):
-        sel = [r for r in rows if r["kind"] == kind]
-        if sel:
-            print(f"## {LABELS[kind]}（{len(sel)}）\n\n| 項目 | GitHub | Local CI |\n| --- | --- | --- |")
-            for r in sel:
-                print(f"| `{r['key']}` | {cell(r['github'])} | {cell(r['local'])} |")
-            print()
+    unexpected = [r for r in rows if not r["known"]]
+    print(f"## 要確認（{len(unexpected)}）\n")
+    if unexpected:
+        print("既知の違い（`.github/parity/known.json`）に当てはまらないもの。Local CI の不具合か、まだ分類していない違い。\n")
+        print(table(unexpected))
+    else:
+        print("なし。\n")
 
+    known = [r for r in rows if r["known"]]
+    if known:
+        print(f"## 既知の違い（{len(known)}）\n")
+        print("| 理由 | 件数 |\n| --- | --- |")
+        by_rule = {}
+        for r in known:
+            by_rule.setdefault(r["known"], []).append(r)
+        for rule in rules:
+            items = by_rule.get(rule["id"])
+            if items:
+                reason = f"[{rule['reason']}]({rule['doc']})" if rule.get("doc") else rule["reason"]
+                print(f"| {reason} | {len(items)} |")
+        print()
+        for rule in rules:
+            items = by_rule.get(rule["id"])
+            if items:
+                print(f"<details><summary>{rule['reason']}（{len(items)}）</summary>\n")
+                print(table(items))
+                print("</details>\n")
 
 if __name__ == "__main__":
     main()

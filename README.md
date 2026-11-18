@@ -11,10 +11,13 @@
 
 各フォルダの `history.csv` に週ごとの件数、`YYYY-MM-DD.md` の先頭に前回からの変化がある。
 
+レポートは、Local CI の仕様として分かっている違い（[`.github/parity/known.json`](.github/parity/known.json)、理由と根拠のドキュメント付き）を「既知の違い」にまとめ、それ以外を「要確認」として先に出す。要確認に出たものは、Local CI の不具合か、まだ分類していない違い。調べて仕様だと分かったら `known.json` に足す。
+
 ## ファイル
 
 - `.github/workflows/parity-probe.yml` … 調査用 workflow（本物と Local CI の両方で実行）
 - `.github/workflows/parity-weekly.yml` … GitHub Actions での毎週の比較
 - `.github/parity/probe.py` … 環境を調べて `PARITY-JSON` 行を出す
 - `.github/parity/compare.py` … 2 つのログを比べて Markdown のレポートを作る
+- `.github/parity/known.json` … 既知の違いの一覧（項目名の正規表現と理由）
 - `.github/local-ci.Dockerfile` … Local CI の runner イメージに python3 を足す

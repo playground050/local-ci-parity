@@ -132,11 +132,9 @@ jobs:
           JSON
           PREV=$(ls "$R"/20*.json 2>/dev/null | grep -v "/$DATE.json" | sort | tail -1 || true)
           python3 .github/parity/compare.py "$RUNNER_TEMP/github.log" "$RUNNER_TEMP/lci/localci.log" \
-            --meta "$RUNNER_TEMP/meta.json" --json "$R/$DATE.json" ${PREV:+--prev "$PREV"} > "$R/$DATE.md"
+            --meta "$RUNNER_TEMP/meta.json" --json "$R/$DATE.json" ${PREV:+--prev "$PREV"} \
+            --history "$R/history.csv" > "$R/$DATE.md"
           cp "$R/$DATE.md" "$R/latest.md"
-          [ -f "$R/history.csv" ] || echo "date,differ,github_only,local_only,same,local_ci_exit" > "$R/history.csv"
-          grep -v "^$DATE," "$R/history.csv" > "$R/history.tmp" && mv "$R/history.tmp" "$R/history.csv"
-          python3 -c "import json,sys; d=json.load(open(sys.argv[1])); c=d['counts']; print(f\"{d['meta']['date']},{c['differ']},{c['github_only']},{c['local_only']},{c['same']},{d['meta']['local_ci_exit']}\")" "$R/$DATE.json" >> "$R/history.csv"
           cat "$R/$DATE.md" >> "$GITHUB_STEP_SUMMARY"
       - name: Commit report
         run: |
