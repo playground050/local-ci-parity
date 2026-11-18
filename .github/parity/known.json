@@ -110,12 +110,14 @@
     },
     {
       "id": "reusable-call",
-      "reason": "本物では parity-probe.yml を parity-weekly.yml から呼び出す（workflow_call）ため、github.workflow は呼び出し元になる。Local CI では parity-probe.yml を直接実行している（比べ方の違いで、Local CI の問題ではない）",
+      "reason": "本物では parity-probe.yml を parity-weekly.yml から呼び出す（workflow_call）ため、github.workflow は呼び出し元になる。Local CI では parity-probe.yml を直接実行している（比べ方の違いで、Local CI の問題ではない）。また本物では、呼び出された再利用ワークフローの inputs に parity-weekly.yml の workflow_dispatch の入力（localci_source）も入る",
       "kinds": [
-        "differ"
+        "differ",
+        "github_only"
       ],
       "keys": [
-        "probe\\.env_github\\.GITHUB_WORKFLOW(_REF)?$"
+        "probe\\.env_github\\.GITHUB_WORKFLOW(_REF)?$",
+        "reusable-inner\\.inputs\\.localci_source$"
       ]
     },
     {
