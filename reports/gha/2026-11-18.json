@@ -1,27 +1,27 @@
 {
  "broken": {
   "github": {},
-  "local": {}
+  "local": {
+   "probe": "読めない（1006 文字, Incorrect padding）"
+  }
  },
  "counts": {
-  "differ": 42,
-  "github_only": 129,
+  "differ": 41,
+  "github_only": 131,
   "ignored": 38,
-  "local_only": 29,
-  "same": 70
+  "local_only": 30,
+  "same": 71
  },
  "meta": {
-  "commit": "2182fb52816902fff015f9e95b2cb79ef5a1105d",
+  "commit": "6a7804824585394a5e80db3361b193efbf61a324",
   "date": "2026-11-18",
-  "local_ci": "run-local-ci@0.18.1",
+  "local_ci": "github:playground050/local-ci@fixes/all (d065f3a)",
   "local_ci_exit": "1",
-  "run": "https://github.com/playground050/local-ci-parity/actions/runs/44320614147",
+  "run": "https://github.com/playground050/local-ci-parity/actions/runs/44321880453",
   "where": "GitHub Actions (ubuntu-latest, Docker)"
  },
  "missing_jobs": {
-  "github_only": [
-   "dependent"
-  ],
+  "github_only": [],
   "local_only": []
  },
  "rows": [
@@ -36,6 +36,24 @@
    "key": "after-soft-fail.soft_fail",
    "kind": "differ",
    "local": "/"
+  },
+  {
+   "github": "—",
+   "key": "dependent.needs",
+   "kind": "local_only",
+   "local": ""
+  },
+  {
+   "github": "42",
+   "key": "dependent.needs.probe.outputs.answer",
+   "kind": "github_only",
+   "local": "—"
+  },
+  {
+   "github": "success",
+   "key": "dependent.needs.probe.result",
+   "kind": "github_only",
+   "local": "—"
   },
   {
    "github": "—",
@@ -80,13 +98,13 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.artifacts",
    "kind": "github_only",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.artifacts_list",
    "kind": "github_only",
    "local": "—"
@@ -98,7 +116,7 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.env",
    "kind": "github_only",
    "local": "—"
@@ -134,13 +152,13 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.output",
    "kind": "github_only",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.path",
    "kind": "github_only",
    "local": "—"
@@ -206,19 +224,19 @@
    "local": "—"
   },
   {
-   "github": "2182fb52816902fff015f9e95b2cb79ef5a1105d",
+   "github": "6a7804824585394a5e80db3361b193efbf61a324",
    "key": "probe.contexts.github.sha",
    "kind": "github_only",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.state",
    "kind": "github_only",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_fb2ebd28-eec6-4793-a1fe-0b30879723ea",
+   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_4a660f6a-9289-4791-a551-cf014aa189b8",
    "key": "probe.contexts.github.step_summary",
    "kind": "github_only",
    "local": "—"
@@ -302,7 +320,7 @@
    "local": "—"
   },
   {
-   "github": "GitHub Actions 1000000168",
+   "github": "GitHub Actions 1000000178",
    "key": "probe.contexts.runner.name",
    "kind": "github_only",
    "local": "—"
@@ -383,19 +401,19 @@
    "github": "https://api.github.com",
    "key": "probe.env_github.GITHUB_API_URL",
    "kind": "differ",
-   "local": "http://host.docker.internal:42753"
+   "local": "http://host.docker.internal:44277"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_ARTIFACTS",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_ARTIFACTS_LIST",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_list_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_list_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
    "github": "",
@@ -404,10 +422,10 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_ENV",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/set_env_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/set_env_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
    "github": "workflow_dispatch",
@@ -425,7 +443,7 @@
    "github": "https://api.github.com/graphql",
    "key": "probe.env_github.GITHUB_GRAPHQL_URL",
    "kind": "differ",
-   "local": "http://host.docker.internal:42753/_graphql"
+   "local": "http://host.docker.internal:44277/_graphql"
   },
   {
    "github": "",
@@ -440,16 +458,16 @@
    "local": "local-job"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_OUTPUT",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/set_output_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/set_output_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_PATH",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/add_path_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/add_path_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
    "github": "main",
@@ -476,16 +494,16 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_STATE",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/save_state_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/save_state_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_f2fbacab-ef93-4638-98a1-0f48f8e38bcf",
+   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_56f3c5fa-b554-4674-8965-90dc0cfae3ee",
    "key": "probe.env_github.GITHUB_STEP_SUMMARY",
    "kind": "differ",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/step_summary_0b2cf5bb-27d8-4e91-bd4a-167070729897"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/step_summary_6057c9fc-31c8-4f93-9a29-7c64c05e8f28"
   },
   {
    "github": "playground050",
@@ -527,7 +545,7 @@
    "github": "—",
    "key": "probe.env_github.RUNNER_REPOSITORY_URL",
    "kind": "local_only",
-   "local": "http://host.docker.internal:42753/playground050/local-ci-parity"
+   "local": "http://host.docker.internal:44277/playground050/local-ci-parity"
   },
   {
    "github": "/home/runner/work/_temp",
@@ -1088,19 +1106,13 @@
    "local": ""
   },
   {
-   "github": "2182fb52816902fff015f9e95b2cb79ef5a1105d",
-   "key": "probe.expressions.EXPR_SHA",
-   "kind": "differ",
-   "local": "0000000000000000000000000000000000000000"
-  },
-  {
    "github": "main",
    "key": "probe.git.branch",
    "kind": "differ",
-   "local": "2182fb52816902fff015f9e95b2cb79ef5a1105d"
+   "local": "6a7804824585394a5e80db3361b193efbf61a324"
   },
   {
-   "github": "4",
+   "github": "6",
    "key": "probe.git.commit_count",
    "kind": "differ",
    "local": "1"
