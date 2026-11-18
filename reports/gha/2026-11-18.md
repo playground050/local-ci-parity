@@ -1,12 +1,14 @@
 # Local CI parity report 2026-11-18
 
 - where: GitHub Actions (ubuntu-latest, Docker)
-- commit: afc8560ca3bbe2cbffd312e53fdc4a299eee56ba
-- run: https://github.com/playground050/local-ci-parity/actions/runs/44324052551
-- local_ci: github:playground050/local-ci@fixes/all (1052d40)
+- commit: f73fee31c7b902d79c1b56c02b9e4ee19a580f4e
+- run: https://github.com/playground050/local-ci-parity/actions/runs/44325272945
+- local_ci: github:playground050/local-ci@fixes/all (dac6602)
 - local_ci_exit: 1
 
 違い 43、GitHub のみ 122、Local CI のみ 28、一致 78（実行ごとに変わる 38 項目は除外）
+
+> 注意: Local CI の `probe` を読めなかった: 読めない（1006 文字, Incorrect padding）
 
 ## 値が違う（43）
 
@@ -17,25 +19,25 @@
 | `dependent.needs.probe.result` | success | failure |
 | `probe.contexts.github.head_ref` | "" | main |
 | `probe.env_github.GITHUB_ACTION` | __run | probe |
-| `probe.env_github.GITHUB_API_URL` | https://api.github.com | http://host.docker.internal:40149 |
-| `probe.env_github.GITHUB_ARTIFACTS` | /home/runner/work/_temp/_runner_file_commands/artifacts_5ab120d2-c0fa… | /home/runner/_work/_temp/_runner_file_commands/artifacts_135fd297-51a… |
-| `probe.env_github.GITHUB_ARTIFACTS_LIST` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_5ab120d2… | /home/runner/_work/_temp/_runner_file_commands/artifacts_list_135fd29… |
-| `probe.env_github.GITHUB_ENV` | /home/runner/work/_temp/_runner_file_commands/set_env_5ab120d2-c0fa-4… | /home/runner/_work/_temp/_runner_file_commands/set_env_135fd297-51a0-… |
+| `probe.env_github.GITHUB_API_URL` | https://api.github.com | http://host.docker.internal:44723 |
+| `probe.env_github.GITHUB_ARTIFACTS` | /home/runner/work/_temp/_runner_file_commands/artifacts_157027ff-a50b… | /home/runner/_work/_temp/_runner_file_commands/artifacts_f455e04a-91c… |
+| `probe.env_github.GITHUB_ARTIFACTS_LIST` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_157027ff… | /home/runner/_work/_temp/_runner_file_commands/artifacts_list_f455e04… |
+| `probe.env_github.GITHUB_ENV` | /home/runner/work/_temp/_runner_file_commands/set_env_157027ff-a50b-4… | /home/runner/_work/_temp/_runner_file_commands/set_env_f455e04a-91ca-… |
 | `probe.env_github.GITHUB_EVENT_NAME` | workflow_dispatch | push |
 | `probe.env_github.GITHUB_EVENT_PATH` | /home/runner/work/_temp/_github_workflow/event.json | /home/runner/_work/_temp/_github_workflow/event.json |
-| `probe.env_github.GITHUB_GRAPHQL_URL` | https://api.github.com/graphql | http://host.docker.internal:40149/_graphql |
+| `probe.env_github.GITHUB_GRAPHQL_URL` | https://api.github.com/graphql | http://host.docker.internal:44723/_graphql |
 | `probe.env_github.GITHUB_JOB` | probe | local-job |
-| `probe.env_github.GITHUB_OUTPUT` | /home/runner/work/_temp/_runner_file_commands/set_output_5ab120d2-c0f… | /home/runner/_work/_temp/_runner_file_commands/set_output_135fd297-51… |
-| `probe.env_github.GITHUB_PATH` | /home/runner/work/_temp/_runner_file_commands/add_path_5ab120d2-c0fa-… | /home/runner/_work/_temp/_runner_file_commands/add_path_135fd297-51a0… |
-| `probe.env_github.GITHUB_STATE` | /home/runner/work/_temp/_runner_file_commands/save_state_5ab120d2-c0f… | /home/runner/_work/_temp/_runner_file_commands/save_state_135fd297-51… |
-| `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_5ab120d2-c… | /home/runner/_work/_temp/_runner_file_commands/step_summary_135fd297-… |
+| `probe.env_github.GITHUB_OUTPUT` | /home/runner/work/_temp/_runner_file_commands/set_output_157027ff-a50… | /home/runner/_work/_temp/_runner_file_commands/set_output_f455e04a-91… |
+| `probe.env_github.GITHUB_PATH` | /home/runner/work/_temp/_runner_file_commands/add_path_157027ff-a50b-… | /home/runner/_work/_temp/_runner_file_commands/add_path_f455e04a-91ca… |
+| `probe.env_github.GITHUB_STATE` | /home/runner/work/_temp/_runner_file_commands/save_state_157027ff-a50… | /home/runner/_work/_temp/_runner_file_commands/save_state_f455e04a-91… |
+| `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_157027ff-a… | /home/runner/_work/_temp/_runner_file_commands/step_summary_f455e04a-… |
 | `probe.env_github.GITHUB_WORKSPACE` | /home/runner/work/local-ci-parity/local-ci-parity | /home/runner/_work/local-ci-parity/local-ci-parity |
 | `probe.env_github.RUNNER_TEMP` | /home/runner/work/_temp | /home/runner/_work/_temp |
 | `probe.env_github.RUNNER_WORKSPACE` | /home/runner/work/local-ci-parity | /home/runner/_work/local-ci-parity |
 | `probe.expressions.EXPR_EVENT` | workflow_dispatch | "" |
-| `probe.git.branch` | main | afc8560ca3bbe2cbffd312e53fdc4a299eee56ba |
-| `probe.git.commit_count` | 10 | 1 |
-| `probe.git.last_commit_author` | playground050 | local-ci |
+| `probe.git.branch` | main | f73fee31c7b902d79c1b56c02b9e4ee19a580f4e |
+| `probe.git.commit_count` | 11 | 1 |
+| `probe.git.last_commit_author` | github-actions[bot] | local-ci |
 | `probe.git.remote` | https://github.com/playground050/local-ci-parity | http://127.0.0.1/playground050/local-ci-parity |
 | `probe.git.status_clean` | true | false |
 | `probe.system.locale` | C.UTF-8 | "" |
@@ -66,16 +68,16 @@
 | `probe.contexts.github.action_repository` | "" | — |
 | `probe.contexts.github.api_url` | https://api.github.com | — |
 | `probe.contexts.github.artifact_cache_size_limit` | 10 | — |
-| `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_e62163ec-28e0… | — |
-| `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_e62163ec… | — |
+| `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_03d9db49-f801… | — |
+| `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_03d9db49… | — |
 | `probe.contexts.github.base_ref` | "" | — |
-| `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_e62163ec-28e0-4… | — |
+| `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_03d9db49-f801-4… | — |
 | `probe.contexts.github.event_name` | workflow_dispatch | — |
 | `probe.contexts.github.event_path` | /home/runner/work/_temp/_github_workflow/event.json | — |
 | `probe.contexts.github.graphql_url` | https://api.github.com/graphql | — |
 | `probe.contexts.github.job` | probe | — |
-| `probe.contexts.github.output` | /home/runner/work/_temp/_runner_file_commands/set_output_e62163ec-28e… | — |
-| `probe.contexts.github.path` | /home/runner/work/_temp/_runner_file_commands/add_path_e62163ec-28e0-… | — |
+| `probe.contexts.github.output` | /home/runner/work/_temp/_runner_file_commands/set_output_03d9db49-f80… | — |
+| `probe.contexts.github.path` | /home/runner/work/_temp/_runner_file_commands/add_path_03d9db49-f801-… | — |
 | `probe.contexts.github.ref` | refs/heads/main | — |
 | `probe.contexts.github.ref_protected` | false | — |
 | `probe.contexts.github.ref_type` | branch | — |
@@ -83,8 +85,8 @@
 | `probe.contexts.github.repository_visibility` | public | — |
 | `probe.contexts.github.secret_source` | <removed> | — |
 | `probe.contexts.github.server_url` | https://github.com | — |
-| `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_e62163ec-28e… | — |
-| `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_e62163ec-2… | — |
+| `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_03d9db49-f80… | — |
+| `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_03d9db49-f… | — |
 | `probe.contexts.github.token` | <removed> | — |
 | `probe.contexts.github.triggering_actor` | playground050 | — |
 | `probe.contexts.github.workflow` | parity-weekly | — |
@@ -95,7 +97,7 @@
 | `probe.contexts.job.workflow_ref` | playground050/local-ci-parity/.github/workflows/parity-probe.yml@refs… | — |
 | `probe.contexts.job.workflow_repository` | playground050/local-ci-parity | — |
 | `probe.contexts.runner.environment` | github-hosted | — |
-| `probe.contexts.runner.name` | GitHub Actions 1000000189 | — |
+| `probe.contexts.runner.name` | GitHub Actions 1000000194 | — |
 | `probe.contexts.runner.temp` | /home/runner/work/_temp | — |
 | `probe.contexts.runner.tool_cache` | /opt/hostedtoolcache | — |
 | `probe.contexts.runner.workspace` | /home/runner/work/local-ci-parity | — |
@@ -192,7 +194,7 @@
 | `probe.contexts.steps` | — | "" |
 | `probe.env_github.ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT` | — | 1 |
 | `probe.env_github.RUNNER_MANUALLY_TRAP_SIG` | — | 1 |
-| `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:40149/playground050/local-ci-parity |
+| `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:44723/playground050/local-ci-parity |
 | `probe.env_names[ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT]` | — | present |
 | `probe.env_names[ACTIONS_RUNTIME_TOKEN]` | — | present |
 | `probe.env_names[AGENT_CI_DTU_HOST]` | — | present |
