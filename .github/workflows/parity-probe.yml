@@ -25,10 +25,6 @@ jobs:
       - id: out
         name: step output
         run: echo "answer=42" >> "$GITHUB_OUTPUT"
-      - id: soft-fail
-        name: continue-on-error step
-        continue-on-error: true
-        run: exit 3
       - name: probe
         env:
           CTX_GITHUB: ${{ toJSON(github) }}
@@ -38,8 +34,24 @@ jobs:
           EXPR_SHA: ${{ github.sha }}
           EXPR_REF_NAME: ${{ github.ref_name }}
           EXPR_EVENT: ${{ github.event_name }}
-          EXPR_SOFT_FAIL: ${{ steps.soft-fail.outcome }}/${{ steps.soft-fail.conclusion }}
         run: python3 .github/parity/probe.py probe
+      # 失敗を許す step。Local CI が continue-on-error を無視すると job がここで止まるため、
+      # 主要な情報を集める probe より後に置く
+      - id: soft-fail
+        name: continue-on-error step
+        continue-on-error: true
+        run: exit 3
+      - name: probe after soft-fail
+        if: always()
+        env:
+          SOFT_FAIL: ${{ steps.soft-fail.outcome }}/${{ steps.soft-fail.conclusion }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python3 - <<'EOF'
+          import base64, json, os
+          data = {"soft_fail": os.environ["SOFT_FAIL"], "job_status": os.environ["JOB_STATUS"]}
+          print("PARITY-JSON after-soft-fail " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          EOF
   dependent:
     needs: probe
     if: always()

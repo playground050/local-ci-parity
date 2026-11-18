@@ -65,7 +65,7 @@ data = {
         "status_clean": sh("git status --porcelain | wc -l") == "0",
         "last_commit_author": sh("git log -1 --format=%an"),
     },
-    "expressions": {k: os.environ.get(k) for k in ("EXPR_SHA", "EXPR_REF_NAME", "EXPR_EVENT", "EXPR_SOFT_FAIL")},
+    "expressions": {k: os.environ.get(k) for k in ("EXPR_SHA", "EXPR_REF_NAME", "EXPR_EVENT")},
     "contexts": {"github": ctx("CTX_GITHUB"), "runner": ctx("CTX_RUNNER"),
                  "job": ctx("CTX_JOB"), "steps": ctx("CTX_STEPS")},
 }
