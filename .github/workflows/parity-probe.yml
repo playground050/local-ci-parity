@@ -443,3 +443,93 @@ jobs:
           data = {"needs": json.loads(os.environ["CTX_NEEDS"]), "number_eq_7": os.environ["NUMBER_PLUS"]}
           print("PARITY-JSON after-reusable " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
           PY
+
+  # ── job レベルの式 ──────────────────────────────────────────────────────
+  # job の if: は Local CI が自分で評価する。各 job が実行されたかどうか（success か skipped か）を
+  # 後の job の needs で記録する。jif-control-false は本物でもスキップされる対照
+  jif-bool-num:
+    if: true == 1
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-hex:
+    if: 0xff == 255
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-index:
+    if: fromJSON('[10,20]')[1] == 20
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-filter:
+    if: contains(fromJSON('[{"n":1},{"n":2}]').*.n, 2)
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-format:
+    if: format('{0}-{{x}}', 'a') == 'a-{x}'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-str-ci:
+    if: ${{ 'ABC' == 'abc' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-str-less:
+    if: ${{ 'a' < 'B' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-null:
+    if: fromJSON('{"k":null}').k == null
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-starts:
+    if: startsWith(github.ref, 'refs/heads/')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  jif-control-false:
+    if: 1 == 2
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ran
+  job-expressions:
+    needs: [jif-bool-num, jif-hex, jif-index, jif-filter, jif-format, jif-str-ci, jif-str-less, jif-null, jif-starts, jif-control-false]
+    if: always()
+    runs-on: ${{ format('ubuntu-{0}', 'latest') }}
+    env:
+      JE_BOOL_NUM: ${{ true == 1 }}
+      JE_HEX: ${{ 0xff }}
+      JE_INDEX: ${{ fromJSON('[10,20]')[1] }}
+      JE_FILTER: ${{ toJSON(fromJSON('[{"n":1},{"n":2}]').*.n) }}
+      JE_FORMAT: ${{ format('{0}-{{x}}', 'a') }}
+    strategy:
+      matrix:
+        value: ${{ fromJSON(format('[{0},{1}]', 1, 2)) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: probe job-level expressions
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+          JIF_BOOL_NUM: ${{ needs.jif-bool-num.result }}
+          JIF_HEX: ${{ needs.jif-hex.result }}
+          JIF_INDEX: ${{ needs.jif-index.result }}
+          JIF_FILTER: ${{ needs.jif-filter.result }}
+          JIF_FORMAT: ${{ needs.jif-format.result }}
+          JIF_STR_CI: ${{ needs.jif-str-ci.result }}
+          JIF_STR_LESS: ${{ needs.jif-str-less.result }}
+          JIF_NULL: ${{ needs.jif-null.result }}
+          JIF_STARTS: ${{ needs.jif-starts.result }}
+          JIF_CONTROL_FALSE: ${{ needs.jif-control-false.result }}
+          MATRIX: ${{ toJSON(matrix) }}
+          LEG: ${{ matrix.value }}
+        run: >-
+          python3 .github/parity/emit.py "job-expressions-$LEG"
+          JIF_BOOL_NUM JIF_HEX JIF_INDEX JIF_FILTER JIF_FORMAT JIF_STR_CI JIF_STR_LESS JIF_NULL JIF_STARTS
+          JIF_CONTROL_FALSE MATRIX JE_BOOL_NUM JE_HEX JE_INDEX JE_FILTER JE_FORMAT
