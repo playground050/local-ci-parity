@@ -129,6 +129,14 @@
       "keys": [
         "probe\\.env_(names\\[|github\\.)(GITHUB_ACTOR_ID|GITHUB_REPOSITORY_ID|GITHUB_REPOSITORY_OWNER_ID)\\]?$"
       ]
+    },
+    {
+      "id": "service-network",
+      "reason": "Local CI はサービスコンテナを自分で起動し、ジョブの中から localhost:<コンテナのポート> とサービス名で届くように転送する。runner がサービスを起動しないため job.services は空で、Docker が選ぶホスト側のポート番号もジョブからは見えない。本物ではジョブがホスト上で動くので、届くのは localhost:<ホスト側のポート> だけ",
+      "doc": "https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md",
+      "keys": [
+        "services\\.(names|fields|has_mapped_port|port_differs_from_container|has_network|via_localhost_mapped|via_hostname|via_localhost_container_port)"
+      ]
     }
   ]
 }

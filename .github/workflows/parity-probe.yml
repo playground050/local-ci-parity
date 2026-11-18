@@ -346,7 +346,7 @@ jobs:
                       return s.recv(16).decode().strip()
               except Exception as e:
                   return type(e).__name__
-          svc = json.loads(os.environ["SVC"] or "{}")
+          svc = json.loads(os.environ["SVC"] or "null") or {}
           port = os.environ["MAPPED_PORT"]
           redis = svc.get("redis", {})
           data = {
@@ -357,6 +357,7 @@ jobs:
               "has_network": bool(redis.get("network")),
               "via_localhost_mapped": ping("localhost", port) if port else "no-port",
               "via_hostname": ping("redis", 6379),
+              "via_localhost_container_port": ping("localhost", 6379),
           }
           print("PARITY-JSON services " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
           PY
