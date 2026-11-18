@@ -66,3 +66,29 @@ jobs:
           data = {"needs": json.loads(os.environ["CTX_NEEDS"])}
           print("PARITY-JSON dependent " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
           PY
+  # job 単位の continue-on-error。失敗しても run は成功扱いで、後続 job から見た結果を記録する
+  soft-job:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    outputs:
+      before: ${{ steps.before.outputs.value }}
+    steps:
+      - id: before
+        name: output before failure
+        run: echo "value=set-before-failure" >> "$GITHUB_OUTPUT"
+      - name: fail the job
+        run: exit 4
+  after-soft-job:
+    # if: を書かない（暗黙の success()）。本物で soft-job が成功扱いなら実行される
+    needs: soft-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe needs of a continue-on-error job
+        env:
+          CTX_NEEDS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {"needs": json.loads(os.environ["CTX_NEEDS"])}
+          print("PARITY-JSON after-soft-job " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
