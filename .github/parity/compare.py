@@ -40,9 +40,11 @@ def extract(path):
                 except zlib.error:
                     pass
                 out[label] = json.loads(raw)
-                broken.pop(label, None)
             except ValueError as e:
                 broken[label] = f"読めない（{len(data)} 文字, {e}）"
+    # 読めた行が別にあるラベルは注意に出さない。Local CI のジョブ全体のログには、
+    # 1024 文字で切られた同じ行の写しが混ざることがある（ライブ表示用のログ由来）
+    broken = {label: why for label, why in broken.items() if label not in out}
     if broken:
         out["_broken"] = broken
     return out
