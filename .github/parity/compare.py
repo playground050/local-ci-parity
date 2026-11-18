@@ -4,7 +4,7 @@
   python3 compare.py github.log localci.log --meta meta.json \
       --json out.json [--prev previous.json] [--redact TEXT ...] > report.md
 """
-import argparse, base64, datetime, json, re
+import argparse, base64, datetime, json, re, zlib
 
 # 実行ごとに変わるのが当然で、違いとして数えないもの
 VOLATILE = re.compile(
@@ -19,12 +19,26 @@ LABELS = {"differ": "値が違う", "github_only": "GitHub にだけある", "lo
 
 
 def extract(path):
-    out = {}
+    """ラベルごとの JSON を返す。読めなかったラベルは "_broken" に理由を入れる。"""
+    out, broken = {}, {}
     with open(path, errors="replace") as f:
         for line in f:
             m = MARK.search(line)
-            if m:
-                out[m.group(1)] = json.loads(base64.b64decode(m.group(2)))
+            if not m:
+                continue
+            label, data = m.groups()
+            try:
+                raw = base64.b64decode(data)
+                try:
+                    raw = zlib.decompress(raw)  # probe.py は圧縮して出す。workflow 内の小さな出力は無圧縮
+                except zlib.error:
+                    pass
+                out[label] = json.loads(raw)
+                broken.pop(label, None)
+            except ValueError as e:
+                broken[label] = f"読めない（{len(data)} 文字, {e}）"
+    if broken:
+        out["_broken"] = broken
     return out
 
 
@@ -61,7 +75,9 @@ def main():
     gh, lc = extract(a.github_log), extract(a.localci_log)
     meta = json.load(open(a.meta)) if a.meta else {}
     rows, counts = [], {"differ": 0, "github_only": 0, "local_only": 0, "same": 0, "ignored": 0}
-    for job in sorted(set(gh) | set(lc)):
+    broken = {"github": gh.pop("_broken", {}), "local": lc.pop("_broken", {})}
+    # 片方にしかないジョブは項目ごとに並べず、まとめて注意として出す
+    for job in sorted(set(gh) & set(lc)):
         x, y = dict(flatten(gh.get(job, {}))), dict(flatten(lc.get(job, {})))
         for key in sorted(set(x) | set(y)):
             if VOLATILE.search(key):
@@ -79,8 +95,8 @@ def main():
                          "github": redact(x.get(key, "—"), a.redact),
                          "local": redact(y.get(key, "—"), a.redact)})
 
-    missing = [j for j in ("probe", "dependent") if j not in gh or j not in lc]
-    result = {"meta": meta, "counts": counts, "missing_jobs": missing, "rows": rows}
+    missing = {"github_only": sorted(set(gh) - set(lc)), "local_only": sorted(set(lc) - set(gh))}
+    result = {"meta": meta, "counts": counts, "missing_jobs": missing, "broken": broken, "rows": rows}
     if a.json:
         json.dump(result, open(a.json, "w"), ensure_ascii=False, indent=1, sort_keys=True)
 
@@ -90,8 +106,12 @@ def main():
             print(f"- {k}: {v}")
     print(f"\n違い {counts['differ']}、GitHub のみ {counts['github_only']}、Local CI のみ "
           f"{counts['local_only']}、一致 {counts['same']}（実行ごとに変わる {counts['ignored']} 項目は除外）\n")
-    if missing:
-        print(f"> 注意: 次のジョブの結果が片方にない: {', '.join(missing)}\n")
+    for side, jobs in missing.items():
+        if jobs:
+            print(f"> 注意: {LABELS[side]}ジョブ結果（比較から除外）: {', '.join(jobs)}\n")
+    for side, items in broken.items():
+        for label, why in items.items():
+            print(f"> 注意: {'GitHub' if side == 'github' else 'Local CI'} の `{label}` を読めなかった: {why}\n")
 
     if a.prev:
         try:

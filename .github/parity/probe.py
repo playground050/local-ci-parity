@@ -1,5 +1,5 @@
 """runner の環境を調べて、1 行の PARITY-JSON としてログに出す。"""
-import base64, json, os, platform, shutil, subprocess, sys
+import base64, json, os, platform, shutil, subprocess, sys, zlib
 
 SECRET_HINTS = ("token", "secret", "password", "key")
 
@@ -70,4 +70,6 @@ data = {
                  "job": ctx("CTX_JOB"), "steps": ctx("CTX_STEPS")},
 }
 label = sys.argv[1] if len(sys.argv) > 1 else "probe"
-print(f"PARITY-JSON {label} " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+# Docker は 16KB を超えるログ行を分割するため、圧縮して 1 行を短くする
+payload = base64.b64encode(zlib.compress(json.dumps(data, sort_keys=True).encode(), 9)).decode()
+print(f"PARITY-JSON {label} {payload}")
