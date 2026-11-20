@@ -9,15 +9,15 @@
   "ignored": 39,
   "known": 170,
   "local_only": 24,
-  "same": 257,
+  "same": 261,
   "unexpected": 0
  },
  "meta": {
-  "commit": "dab2182afb245da90bf09fa0bbea98e87449c727",
+  "commit": "d5c93a3d59adfc3541c8e3da4f8909b9e5dd9800",
   "date": "2026-11-20",
-  "local_ci": "github:playground050/local-ci@fixes/all (162899c)",
-  "local_ci_exit": "0",
-  "run": "https://github.com/playground050/local-ci-parity/actions/runs/44644049053",
+  "local_ci": "github:playground050/local-ci@fixes/all (bc02d38)",
+  "local_ci_exit": "1",
+  "run": "https://github.com/playground050/local-ci-parity/actions/runs/44746720502",
   "where": "GitHub Actions (ubuntu-latest, Docker)"
  },
  "missing_jobs": {
@@ -61,14 +61,14 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.artifacts",
    "kind": "github_only",
    "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.artifacts_list",
    "kind": "github_only",
    "known": "github-context-static",
@@ -82,7 +82,7 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.env",
    "kind": "github_only",
    "known": "github-context-static",
@@ -131,14 +131,14 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.output",
    "kind": "github_only",
    "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.path",
    "kind": "github_only",
    "known": "github-context-static",
@@ -173,14 +173,14 @@
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.state",
    "kind": "github_only",
    "known": "github-context-static",
    "local": "—"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_7e2fd816-3abc-4b5e-bf37-046cd02174b2",
+   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_e58d8518-61c8-41ab-abd3-5c06135ae5fa",
    "key": "probe.contexts.github.step_summary",
    "kind": "github_only",
    "known": "github-context-static",
@@ -250,7 +250,7 @@
    "local": "—"
   },
   {
-   "github": "GitHub Actions 1000000899",
+   "github": "GitHub Actions 1000001102",
    "key": "probe.contexts.runner.name",
    "kind": "github_only",
    "known": "runner-context-partial",
@@ -310,28 +310,28 @@
    "key": "probe.env_github.GITHUB_API_URL",
    "kind": "differ",
    "known": "api-emulation",
-   "local": "http://host.docker.internal:34127"
+   "local": "http://host.docker.internal:44981"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_ARTIFACTS",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/artifacts_list_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_ARTIFACTS_LIST",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_list_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/artifacts_list_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_env_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_ENV",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/set_env_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/set_env_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
    "github": "workflow_dispatch",
@@ -352,7 +352,7 @@
    "key": "probe.env_github.GITHUB_GRAPHQL_URL",
    "kind": "differ",
    "known": "api-emulation",
-   "local": "http://host.docker.internal:34127/_graphql"
+   "local": "http://host.docker.internal:44981/_graphql"
   },
   {
    "github": "probe",
@@ -362,32 +362,32 @@
    "local": "local-job"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/set_output_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_OUTPUT",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/set_output_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/set_output_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/add_path_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_PATH",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/add_path_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/add_path_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/save_state_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_STATE",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/save_state_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/save_state_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
-   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_c993ffe2-b048-40ee-83a2-79a7985f84f5",
+   "github": "/home/runner/work/_temp/_runner_file_commands/step_summary_1d5a96be-4d91-4026-b2c0-380437aa9023",
    "key": "probe.env_github.GITHUB_STEP_SUMMARY",
    "kind": "differ",
    "known": "work-dir",
-   "local": "/home/runner/_work/_temp/_runner_file_commands/step_summary_8329fc65-a389-4cb0-bcf8-ad95a74c2927"
+   "local": "/home/runner/_work/_temp/_runner_file_commands/step_summary_6f0bab4c-0c6b-43f3-ade0-fadd88b77317"
   },
   {
    "github": "parity-weekly",
@@ -429,7 +429,7 @@
    "key": "probe.env_github.RUNNER_REPOSITORY_URL",
    "kind": "local_only",
    "known": "api-emulation",
-   "local": "http://host.docker.internal:34127/playground050/local-ci-parity"
+   "local": "http://host.docker.internal:44981/playground050/local-ci-parity"
   },
   {
    "github": "/home/runner/work/_temp",
@@ -1010,10 +1010,10 @@
    "key": "probe.git.branch",
    "kind": "differ",
    "known": "checkout-copy",
-   "local": "dab2182afb245da90bf09fa0bbea98e87449c727"
+   "local": "d5c93a3d59adfc3541c8e3da4f8909b9e5dd9800"
   },
   {
-   "github": "47",
+   "github": "51",
    "key": "probe.git.commit_count",
    "kind": "differ",
    "known": "checkout-copy",
