@@ -1,0 +1,40 @@
+# fork（playground050/local-ci）のワークフローを、fork の手元ビルドの Local CI で全部実行する。
+# fork の CLAUDE.md が求める `pnpm local-ci-dev run --all` を、Docker のある GitHub の runner で行う。
+name: fork-validate
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: playground050/local-ci の ref
+        default: fixes/all
+permissions:
+  contents: read
+jobs:
+  run-all:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: playground050/local-ci
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: install pnpm and dependencies
+        run: |
+          npm install -g pnpm@10.30.1
+          pnpm install
+      - name: local-ci-dev run --all
+        run: |
+          set +e
+          pnpm local-ci-dev run --all -q 2>&1 | tee "$RUNNER_TEMP/all.log"
+          echo "exit=${PIPESTATUS[0]}"
+          grep -A3 "SUMMARY" "$RUNNER_TEMP/all.log" || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: fork-validate-log
+          path: ${{ runner.temp }}/all.log
