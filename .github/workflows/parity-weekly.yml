@@ -24,6 +24,36 @@ jobs:
       contents: read
     uses: ./.github/workflows/parity-probe.yml
 
+  # わざと失敗する確認項目は別の実行として起動する（この実行は緑のまま）
+  native-failing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: write
+      contents: read
+    outputs:
+      run_id: ${{ steps.dispatch.outputs.run_id }}
+    steps:
+      - id: dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+        run: |
+          since=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run parity-probe-failing.yml --ref "$REF"
+          id=""
+          for _ in $(seq 1 30); do
+            id=$(gh run list --workflow parity-probe-failing.yml --event workflow_dispatch --limit 5 \
+                   --json databaseId,createdAt --jq "[.[] | select(.createdAt >= \"$since\")][0].databaseId // empty")
+            [ -n "$id" ] && break
+            sleep 5
+          done
+          if [ -z "$id" ]; then echo "::error::parity-probe-failing の実行が見つからない"; exit 1; fi
+          echo "run_id=$id" >> "$GITHUB_OUTPUT"
+          # 失敗するのが正常なので、終わるのを待つだけ
+          gh run watch "$id" --interval 15 > /dev/null || true
+
   localci:
     permissions:
       contents: read
@@ -72,6 +102,9 @@ jobs:
           rc=0
           timeout 900 "$RUNNER_TEMP/local-ci" run \
             --workflow .github/workflows/parity-probe.yml --quiet > "$RUNNER_TEMP/localci.out" 2>&1 || rc=$?
+          # わざと失敗する確認項目。失敗するのが正常なので終了コードは記録しない
+          timeout 600 "$RUNNER_TEMP/local-ci" run \
+            --workflow .github/workflows/parity-probe-failing.yml --quiet >> "$RUNNER_TEMP/localci.out" 2>&1 || true
           cat "$RUNNER_TEMP/localci.out"
           echo "LOCALCI_EXIT=$rc" >> "$GITHUB_ENV"
       - name: Collect Local CI step logs
@@ -94,7 +127,7 @@ jobs:
             ${{ runner.temp }}/localci.version
 
   compare:
-    needs: [native, localci]
+    needs: [native, native-failing, localci]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -121,6 +154,15 @@ jobs:
             gh api --allow-escape-sequences "repos/${{ github.repository }}/actions/jobs/$id/logs" >> "$RUNNER_TEMP/github.log" \
               || echo "no log for job $id"
           done
+          # わざと失敗する確認項目の実行（別の run）のログ
+          failing="${{ needs.native-failing.outputs.run_id }}"
+          if [ -n "$failing" ]; then
+            for id in $(gh api --paginate "repos/${{ github.repository }}/actions/runs/$failing/jobs?per_page=100" \
+                          --jq '.jobs[] | select(.conclusion != "skipped") | .id'); do
+              gh api --allow-escape-sequences "repos/${{ github.repository }}/actions/jobs/$id/logs" >> "$RUNNER_TEMP/github.log" \
+                || echo "no log for job $id"
+            done
+          fi
           grep -c "PARITY-JSON" "$RUNNER_TEMP/github.log" || true
       - name: Compare and write report
         run: |

@@ -1,0 +1,66 @@
+# わざと失敗する組み合わせを含む確認項目（fail-fast と max-parallel）。
+# fail-fast は失敗を continue-on-error で隠すと働かないため、この workflow の実行は毎回「失敗」になる。
+# parity-weekly.yml が workflow_dispatch で別の実行として起動し、ログだけを比較に使う
+# （週次の実行自体は緑のまま保つため）。
+name: parity-probe-failing
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  # ── fail-fast と max-parallel ─────────────────────────────────────────────
+  # max-parallel: 1 で 1 本ずつ動かし、最初の組み合わせを失敗させる。
+  # fail-fast（既定で有効）なので、まだ始まっていない 2・3 本目は取り消される（PARITY 行が出ない）。
+  matrix-fail-fast:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        n: [1, 2, 3]
+    steps:
+      - name: fail the first leg
+        if: matrix.n == 1
+        run: exit 1
+      - name: probe a leg that ran
+        env:
+          N: ${{ matrix.n }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          print("PARITY-JSON matrix-fail-fast-leg-" + os.environ["N"] + " " + base64.b64encode(json.dumps({"ran": True}).encode()).decode())
+          PY
+  # fail-fast: false なら全部動く
+  matrix-no-fail-fast:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        n: [1, 2, 3]
+    steps:
+      - name: fail the first leg
+        if: matrix.n == 1
+        run: exit 1
+      - name: probe a leg that ran
+        env:
+          N: ${{ matrix.n }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          print("PARITY-JSON matrix-no-fail-fast-leg-" + os.environ["N"] + " " + base64.b64encode(json.dumps({"ran": True}).encode()).decode())
+          PY
+  after-fail-fast:
+    needs: [matrix-fail-fast, matrix-no-fail-fast]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe matrix results
+        env:
+          FAIL_FAST: ${{ needs.matrix-fail-fast.result }}
+          NO_FAIL_FAST: ${{ needs.matrix-no-fail-fast.result }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {"fail_fast": os.environ["FAIL_FAST"], "no_fail_fast": os.environ["NO_FAIL_FAST"]}
+          print("PARITY-JSON after-fail-fast " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
