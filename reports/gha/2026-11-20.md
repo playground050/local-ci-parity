@@ -1,44 +1,41 @@
 # Local CI parity report 2026-11-20
 
 - where: GitHub Actions (ubuntu-latest, Docker)
-- commit: 16ba002f2128c549d836dd1036fa890b011aef60
-- run: https://github.com/playground050/local-ci-parity/actions/runs/44750976641
-- local_ci: github:playground050/local-ci@fixes/all (bc02d38)
+- commit: c1a559851edf94b84015bb8cef281581ecea2853
+- run: https://github.com/playground050/local-ci-parity/actions/runs/44751858569
+- local_ci: github:playground050/local-ci@fixes/all (b321a92)
 - local_ci_exit: 0
 
 **要確認 0** ／ 既知の違い 170 ／ 一致 261（実行ごとに変わる 39 項目は除外）
 
 ## 前回（2026-11-18）からの変化
 
-**新しく出た違い（23）**
+**新しく出た違い（20）**
 
 | 種類 | 項目 | GitHub | Local CI |
 | --- | --- | --- | --- |
-| 値が違う | `probe.env_github.GITHUB_API_URL` | https://api.github.com | http://host.docker.internal:43245 |
-| 値が違う | `probe.env_github.GITHUB_ARTIFACTS` | /home/runner/work/_temp/_runner_file_commands/artifacts_77aab4a3-766d… | /home/runner/_work/_temp/_runner_file_commands/artifacts_9214af75-f08… |
-| 値が違う | `probe.env_github.GITHUB_ARTIFACTS_LIST` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_77aab4a3… | /home/runner/_work/_temp/_runner_file_commands/artifacts_list_9214af7… |
-| 値が違う | `probe.env_github.GITHUB_ENV` | /home/runner/work/_temp/_runner_file_commands/set_env_77aab4a3-766d-4… | /home/runner/_work/_temp/_runner_file_commands/set_env_9214af75-f083-… |
-| 値が違う | `probe.env_github.GITHUB_GRAPHQL_URL` | https://api.github.com/graphql | http://host.docker.internal:43245/_graphql |
-| 値が違う | `probe.env_github.GITHUB_OUTPUT` | /home/runner/work/_temp/_runner_file_commands/set_output_77aab4a3-766… | /home/runner/_work/_temp/_runner_file_commands/set_output_9214af75-f0… |
-| 値が違う | `probe.env_github.GITHUB_PATH` | /home/runner/work/_temp/_runner_file_commands/add_path_77aab4a3-766d-… | /home/runner/_work/_temp/_runner_file_commands/add_path_9214af75-f083… |
-| 値が違う | `probe.env_github.GITHUB_STATE` | /home/runner/work/_temp/_runner_file_commands/save_state_77aab4a3-766… | /home/runner/_work/_temp/_runner_file_commands/save_state_9214af75-f0… |
-| 値が違う | `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_77aab4a3-7… | /home/runner/_work/_temp/_runner_file_commands/step_summary_9214af75-… |
-| 値が違う | `probe.git.branch` | main | 16ba002f2128c549d836dd1036fa890b011aef60 |
-| 値が違う | `probe.git.commit_count` | 53 | 1 |
-| 値が違う | `probe.git.last_commit_author` | playground050 | local-ci |
-| 値が違う | `probe.tools.node` | v24.22.3 | v24.22.1 |
-| GitHub にだけある | `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_1eb25e69-1d95… | — |
-| GitHub にだけある | `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_1eb25e69… | — |
-| GitHub にだけある | `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_1eb25e69-1d95-4… | — |
-| GitHub にだけある | `probe.contexts.github.output` | /home/runner/work/_temp/_runner_file_commands/set_output_1eb25e69-1d9… | — |
-| GitHub にだけある | `probe.contexts.github.path` | /home/runner/work/_temp/_runner_file_commands/add_path_1eb25e69-1d95-… | — |
-| GitHub にだけある | `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_1eb25e69-1d9… | — |
-| GitHub にだけある | `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_1eb25e69-1… | — |
-| GitHub にだけある | `probe.contexts.runner.name` | GitHub Actions 1000001186 | — |
-| GitHub にだけある | `probe.env_names[GOROOT_1_27_X64]` | present | — |
-| Local CI にだけある | `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:43245/playground050/local-ci-parity |
+| 値が違う | `probe.env_github.GITHUB_API_URL` | https://api.github.com | http://host.docker.internal:36119 |
+| 値が違う | `probe.env_github.GITHUB_ARTIFACTS` | /home/runner/work/_temp/_runner_file_commands/artifacts_398a8b81-69a4… | /home/runner/_work/_temp/_runner_file_commands/artifacts_0c36ce21-304… |
+| 値が違う | `probe.env_github.GITHUB_ARTIFACTS_LIST` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_398a8b81… | /home/runner/_work/_temp/_runner_file_commands/artifacts_list_0c36ce2… |
+| 値が違う | `probe.env_github.GITHUB_ENV` | /home/runner/work/_temp/_runner_file_commands/set_env_398a8b81-69a4-4… | /home/runner/_work/_temp/_runner_file_commands/set_env_0c36ce21-304d-… |
+| 値が違う | `probe.env_github.GITHUB_GRAPHQL_URL` | https://api.github.com/graphql | http://host.docker.internal:36119/_graphql |
+| 値が違う | `probe.env_github.GITHUB_OUTPUT` | /home/runner/work/_temp/_runner_file_commands/set_output_398a8b81-69a… | /home/runner/_work/_temp/_runner_file_commands/set_output_0c36ce21-30… |
+| 値が違う | `probe.env_github.GITHUB_PATH` | /home/runner/work/_temp/_runner_file_commands/add_path_398a8b81-69a4-… | /home/runner/_work/_temp/_runner_file_commands/add_path_0c36ce21-304d… |
+| 値が違う | `probe.env_github.GITHUB_STATE` | /home/runner/work/_temp/_runner_file_commands/save_state_398a8b81-69a… | /home/runner/_work/_temp/_runner_file_commands/save_state_0c36ce21-30… |
+| 値が違う | `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_398a8b81-6… | /home/runner/_work/_temp/_runner_file_commands/step_summary_0c36ce21-… |
+| 値が違う | `probe.git.branch` | main | c1a559851edf94b84015bb8cef281581ecea2853 |
+| 値が違う | `probe.git.commit_count` | 54 | 1 |
+| GitHub にだけある | `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_186a84d0-6ffd… | — |
+| GitHub にだけある | `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_186a84d0… | — |
+| GitHub にだけある | `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_186a84d0-6ffd-4… | — |
+| GitHub にだけある | `probe.contexts.github.output` | /home/runner/work/_temp/_runner_file_commands/set_output_186a84d0-6ff… | — |
+| GitHub にだけある | `probe.contexts.github.path` | /home/runner/work/_temp/_runner_file_commands/add_path_186a84d0-6ffd-… | — |
+| GitHub にだけある | `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_186a84d0-6ff… | — |
+| GitHub にだけある | `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_186a84d0-6… | — |
+| GitHub にだけある | `probe.contexts.runner.name` | GitHub Actions 1000001241 | — |
+| Local CI にだけある | `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:36119/playground050/local-ci-parity |
 
-**解消した違い（23）**
+**解消した違い（20）**
 
 | 種類 | 項目 | GitHub | Local CI |
 | --- | --- | --- | --- |
@@ -53,8 +50,6 @@
 | 値が違う | `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_98a65b23-0… | /home/runner/_work/_temp/_runner_file_commands/step_summary_39d42f5f-… |
 | 値が違う | `probe.git.branch` | main | 8851b331f9497a44ce0f0247a18000a21d613a80 |
 | 値が違う | `probe.git.commit_count` | 45 | 1 |
-| 値が違う | `probe.git.last_commit_author` | github-actions[bot] | local-ci |
-| 値が違う | `probe.tools.node` | v24.22.2 | v24.22.1 |
 | GitHub にだけある | `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_ddc2a760-4011… | — |
 | GitHub にだけある | `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_ddc2a760… | — |
 | GitHub にだけある | `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_ddc2a760-4011-4… | — |
@@ -63,7 +58,6 @@
 | GitHub にだけある | `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_ddc2a760-401… | — |
 | GitHub にだけある | `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_ddc2a760-4… | — |
 | GitHub にだけある | `probe.contexts.runner.name` | GitHub Actions 1000000835 | — |
-| GitHub にだけある | `probe.env_names[GOROOT_1_24_X64]` | present | — |
 | Local CI にだけある | `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:43767/playground050/local-ci-parity |
 
 ## 要確認（0）
@@ -92,14 +86,14 @@
 
 | 種類 | 項目 | GitHub | Local CI |
 | --- | --- | --- | --- |
-| 値が違う | `probe.env_github.GITHUB_ARTIFACTS` | /home/runner/work/_temp/_runner_file_commands/artifacts_77aab4a3-766d… | /home/runner/_work/_temp/_runner_file_commands/artifacts_9214af75-f08… |
-| 値が違う | `probe.env_github.GITHUB_ARTIFACTS_LIST` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_77aab4a3… | /home/runner/_work/_temp/_runner_file_commands/artifacts_list_9214af7… |
-| 値が違う | `probe.env_github.GITHUB_ENV` | /home/runner/work/_temp/_runner_file_commands/set_env_77aab4a3-766d-4… | /home/runner/_work/_temp/_runner_file_commands/set_env_9214af75-f083-… |
+| 値が違う | `probe.env_github.GITHUB_ARTIFACTS` | /home/runner/work/_temp/_runner_file_commands/artifacts_398a8b81-69a4… | /home/runner/_work/_temp/_runner_file_commands/artifacts_0c36ce21-304… |
+| 値が違う | `probe.env_github.GITHUB_ARTIFACTS_LIST` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_398a8b81… | /home/runner/_work/_temp/_runner_file_commands/artifacts_list_0c36ce2… |
+| 値が違う | `probe.env_github.GITHUB_ENV` | /home/runner/work/_temp/_runner_file_commands/set_env_398a8b81-69a4-4… | /home/runner/_work/_temp/_runner_file_commands/set_env_0c36ce21-304d-… |
 | 値が違う | `probe.env_github.GITHUB_EVENT_PATH` | /home/runner/work/_temp/_github_workflow/event.json | /home/runner/_work/_temp/_github_workflow/event.json |
-| 値が違う | `probe.env_github.GITHUB_OUTPUT` | /home/runner/work/_temp/_runner_file_commands/set_output_77aab4a3-766… | /home/runner/_work/_temp/_runner_file_commands/set_output_9214af75-f0… |
-| 値が違う | `probe.env_github.GITHUB_PATH` | /home/runner/work/_temp/_runner_file_commands/add_path_77aab4a3-766d-… | /home/runner/_work/_temp/_runner_file_commands/add_path_9214af75-f083… |
-| 値が違う | `probe.env_github.GITHUB_STATE` | /home/runner/work/_temp/_runner_file_commands/save_state_77aab4a3-766… | /home/runner/_work/_temp/_runner_file_commands/save_state_9214af75-f0… |
-| 値が違う | `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_77aab4a3-7… | /home/runner/_work/_temp/_runner_file_commands/step_summary_9214af75-… |
+| 値が違う | `probe.env_github.GITHUB_OUTPUT` | /home/runner/work/_temp/_runner_file_commands/set_output_398a8b81-69a… | /home/runner/_work/_temp/_runner_file_commands/set_output_0c36ce21-30… |
+| 値が違う | `probe.env_github.GITHUB_PATH` | /home/runner/work/_temp/_runner_file_commands/add_path_398a8b81-69a4-… | /home/runner/_work/_temp/_runner_file_commands/add_path_0c36ce21-304d… |
+| 値が違う | `probe.env_github.GITHUB_STATE` | /home/runner/work/_temp/_runner_file_commands/save_state_398a8b81-69a… | /home/runner/_work/_temp/_runner_file_commands/save_state_0c36ce21-30… |
+| 値が違う | `probe.env_github.GITHUB_STEP_SUMMARY` | /home/runner/work/_temp/_runner_file_commands/step_summary_398a8b81-6… | /home/runner/_work/_temp/_runner_file_commands/step_summary_0c36ce21-… |
 | 値が違う | `probe.env_github.GITHUB_WORKSPACE` | /home/runner/work/local-ci-parity/local-ci-parity | /home/runner/_work/local-ci-parity/local-ci-parity |
 | 値が違う | `probe.env_github.RUNNER_TEMP` | /home/runner/work/_temp | /home/runner/_work/_temp |
 | 値が違う | `probe.env_github.RUNNER_WORKSPACE` | /home/runner/work/local-ci-parity | /home/runner/_work/local-ci-parity |
@@ -111,9 +105,9 @@
 
 | 種類 | 項目 | GitHub | Local CI |
 | --- | --- | --- | --- |
-| 値が違う | `probe.env_github.GITHUB_API_URL` | https://api.github.com | http://host.docker.internal:43245 |
-| 値が違う | `probe.env_github.GITHUB_GRAPHQL_URL` | https://api.github.com/graphql | http://host.docker.internal:43245/_graphql |
-| Local CI にだけある | `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:43245/playground050/local-ci-parity |
+| 値が違う | `probe.env_github.GITHUB_API_URL` | https://api.github.com | http://host.docker.internal:36119 |
+| 値が違う | `probe.env_github.GITHUB_GRAPHQL_URL` | https://api.github.com/graphql | http://host.docker.internal:36119/_graphql |
+| Local CI にだけある | `probe.env_github.RUNNER_REPOSITORY_URL` | — | http://host.docker.internal:36119/playground050/local-ci-parity |
 | 値が違う | `probe.git.remote` | https://github.com/playground050/local-ci-parity | http://127.0.0.1/playground050/local-ci-parity |
 
 </details>
@@ -131,7 +125,7 @@
 | 値が違う | `probe.tools.gcc` | gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0 | null |
 | 値が違う | `probe.tools.jq` | jq-1.8.1 | jq-1.7 |
 | 値が違う | `probe.tools.make` | GNU Make 4.4.1 | null |
-| 値が違う | `probe.tools.node` | v24.22.3 | v24.22.1 |
+| 値が違う | `probe.tools.node` | v24.22.2 | v24.22.1 |
 | 値が違う | `probe.tools.pip3` | pip 25.1.1 from /usr/lib/python3/dist-packages/pip (python 3.14) | null |
 | 値が違う | `probe.tools.python3` | Python 3.14.4 | Python 3.12.3 |
 | 値が違う | `probe.tools.rsync` | rsync  version 3.4.1  protocol version 32 | null |
@@ -171,9 +165,9 @@
 | GitHub にだけある | `probe.env_names[ENABLE_RUNNER_TRACING]` | present | — |
 | GitHub にだけある | `probe.env_names[GECKOWEBDRIVER]` | present | — |
 | GitHub にだけある | `probe.env_names[GHCUP_INSTALL_BASE_PREFIX]` | present | — |
+| GitHub にだけある | `probe.env_names[GOROOT_1_24_X64]` | present | — |
 | GitHub にだけある | `probe.env_names[GOROOT_1_25_X64]` | present | — |
 | GitHub にだけある | `probe.env_names[GOROOT_1_26_X64]` | present | — |
-| GitHub にだけある | `probe.env_names[GOROOT_1_27_X64]` | present | — |
 | GitHub にだけある | `probe.env_names[GRADLE_HOME]` | present | — |
 | GitHub にだけある | `probe.env_names[HCA_CLOUD_PROVIDER]` | present | — |
 | GitHub にだけある | `probe.env_names[HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS]` | present | — |
@@ -240,9 +234,9 @@
 
 | 種類 | 項目 | GitHub | Local CI |
 | --- | --- | --- | --- |
-| 値が違う | `probe.git.branch` | main | 16ba002f2128c549d836dd1036fa890b011aef60 |
-| 値が違う | `probe.git.commit_count` | 53 | 1 |
-| 値が違う | `probe.git.last_commit_author` | playground050 | local-ci |
+| 値が違う | `probe.git.branch` | main | c1a559851edf94b84015bb8cef281581ecea2853 |
+| 値が違う | `probe.git.commit_count` | 54 | 1 |
+| 値が違う | `probe.git.last_commit_author` | github-actions[bot] | local-ci |
 | 値が違う | `probe.git.status_clean` | true | false |
 
 </details>
@@ -266,23 +260,23 @@
 | GitHub にだけある | `probe.contexts.github.action_repository` | "" | — |
 | GitHub にだけある | `probe.contexts.github.api_url` | https://api.github.com | — |
 | GitHub にだけある | `probe.contexts.github.artifact_cache_size_limit` | 10 | — |
-| GitHub にだけある | `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_1eb25e69-1d95… | — |
-| GitHub にだけある | `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_1eb25e69… | — |
+| GitHub にだけある | `probe.contexts.github.artifacts` | /home/runner/work/_temp/_runner_file_commands/artifacts_186a84d0-6ffd… | — |
+| GitHub にだけある | `probe.contexts.github.artifacts_list` | /home/runner/work/_temp/_runner_file_commands/artifacts_list_186a84d0… | — |
 | GitHub にだけある | `probe.contexts.github.base_ref` | "" | — |
-| GitHub にだけある | `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_1eb25e69-1d95-4… | — |
+| GitHub にだけある | `probe.contexts.github.env` | /home/runner/work/_temp/_runner_file_commands/set_env_186a84d0-6ffd-4… | — |
 | GitHub にだけある | `probe.contexts.github.event_path` | /home/runner/work/_temp/_github_workflow/event.json | — |
 | GitHub にだけある | `probe.contexts.github.graphql_url` | https://api.github.com/graphql | — |
 | 値が違う | `probe.contexts.github.head_ref` | "" | main |
 | Local CI にだけある | `probe.contexts.github.head_sha` | — | 0000000000000000000000000000000000000000 |
 | GitHub にだけある | `probe.contexts.github.job` | probe | — |
-| GitHub にだけある | `probe.contexts.github.output` | /home/runner/work/_temp/_runner_file_commands/set_output_1eb25e69-1d9… | — |
-| GitHub にだけある | `probe.contexts.github.path` | /home/runner/work/_temp/_runner_file_commands/add_path_1eb25e69-1d95-… | — |
+| GitHub にだけある | `probe.contexts.github.output` | /home/runner/work/_temp/_runner_file_commands/set_output_186a84d0-6ff… | — |
+| GitHub にだけある | `probe.contexts.github.path` | /home/runner/work/_temp/_runner_file_commands/add_path_186a84d0-6ffd-… | — |
 | GitHub にだけある | `probe.contexts.github.ref_protected` | false | — |
 | GitHub にだけある | `probe.contexts.github.repositoryUrl` | git://github.com/playground050/local-ci-parity.git | — |
 | GitHub にだけある | `probe.contexts.github.repository_visibility` | public | — |
 | GitHub にだけある | `probe.contexts.github.secret_source` | <removed> | — |
-| GitHub にだけある | `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_1eb25e69-1d9… | — |
-| GitHub にだけある | `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_1eb25e69-1… | — |
+| GitHub にだけある | `probe.contexts.github.state` | /home/runner/work/_temp/_runner_file_commands/save_state_186a84d0-6ff… | — |
+| GitHub にだけある | `probe.contexts.github.step_summary` | /home/runner/work/_temp/_runner_file_commands/step_summary_186a84d0-6… | — |
 | GitHub にだけある | `probe.contexts.github.token` | <removed> | — |
 | GitHub にだけある | `probe.contexts.github.triggering_actor` | playground050 | — |
 | GitHub にだけある | `probe.contexts.github.workflow` | parity-weekly | — |
@@ -298,7 +292,7 @@
 | 種類 | 項目 | GitHub | Local CI |
 | --- | --- | --- | --- |
 | GitHub にだけある | `probe.contexts.runner.environment` | github-hosted | — |
-| GitHub にだけある | `probe.contexts.runner.name` | GitHub Actions 1000001186 | — |
+| GitHub にだけある | `probe.contexts.runner.name` | GitHub Actions 1000001241 | — |
 | GitHub にだけある | `probe.contexts.runner.temp` | /home/runner/work/_temp | — |
 | GitHub にだけある | `probe.contexts.runner.tool_cache` | /opt/hostedtoolcache | — |
 | GitHub にだけある | `probe.contexts.runner.workspace` | /home/runner/work/local-ci-parity | — |
