@@ -533,3 +533,34 @@ jobs:
           python3 .github/parity/emit.py "job-expressions-$LEG"
           JIF_BOOL_NUM JIF_HEX JIF_INDEX JIF_FILTER JIF_FORMAT JIF_STR_CI JIF_STR_LESS JIF_NULL JIF_STARTS
           JIF_CONTROL_FALSE MATRIX JE_BOOL_NUM JE_HEX JE_INDEX JE_FILTER JE_FORMAT
+
+  # ── 失敗した step の後の if:（状態関数なし）──────────────────────────────
+  # 本物では if: に状態関数がなければ success() && (…) になり、失敗の後はスキップされる
+  step-if-after-failure:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - id: fail
+        run: exit 1
+      - id: plain-if
+        if: github.ref != ''
+        run: echo ran
+      - id: literal-true
+        if: ${{ true }}
+        run: echo ran
+      - id: with-always
+        if: always() && github.ref != ''
+        run: echo ran
+      - name: probe outcomes
+        if: always()
+        env:
+          PLAIN_IF: ${{ steps.plain-if.outcome }}
+          LITERAL_TRUE: ${{ steps.literal-true.outcome }}
+          WITH_ALWAYS: ${{ steps.with-always.outcome }}
+          FAIL: ${{ steps.fail.outcome }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          data = {k: os.environ[k] for k in ("PLAIN_IF", "LITERAL_TRUE", "WITH_ALWAYS", "FAIL")}
+          print("PARITY-JSON step-if-after-failure " + base64.b64encode(json.dumps(data, sort_keys=True).encode()).decode())
+          PY
