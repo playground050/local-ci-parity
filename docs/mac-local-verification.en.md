@@ -1,6 +1,6 @@
 # Verifying Ansible and GitHub Actions locally on a Mac — findings
 
-Last updated: 2026-11-21
+Last updated: 2026-11-22
 
 ## Summary and conclusions
 
@@ -23,15 +23,15 @@ This investigation applies the idea to Ansible and GitHub Actions: find an envir
 
 ## Verifying GitHub Actions locally
 
-The everyday loop uses Local CI (Agent CI); the final check of features that only exist on GitHub uses a self-hosted runner. The options fall into three groups by "is the runner real?" and "is the GitHub server side real?".
+The everyday loop uses Local CI; the final check of features that only exist on GitHub uses a self-hosted runner. The options fall into three groups by "is the runner real?" and "is the GitHub server side real?".
 
 | Option | Runner | Server side | Push | Strengths and weaknesses |
 | --- | --- | --- | --- | --- |
-| [Local CI / Agent CI](https://github.com/redwoodjs/local-ci) (redwoodjs) | Official | Emulated locally | Not needed | Pauses on the failing step so you can fix it and rerun only that step. Built for agents. 0.x, early stage |
+| [Local CI](https://github.com/redwoodjs/local-ci) (redwoodjs) | Official | Emulated locally | Not needed | Pauses on the failing step so you can fix it and rerun only that step. Built for agents. 0.x, early stage |
 | Self-hosted runner (ephemeral) | Official | GitHub.com | Needed | Covers OIDC, environments and real secrets. Run it on Linux if you use Docker actions |
 | [act](https://github.com/nektos/act) | Reimplementation | Emulated | Not needed | Most widely used. Differs for `workflow_run` and actions that call the GitHub API |
 | [wrkflw](https://github.com/bahdotsh/wrkflw) | Reimplementation | Emulated | Not needed | Similar to act |
-| [runner.server](https://github.com/ChristopherHX/runner.server) | Fork of the official runner | Emulated locally | Not needed | The forerunner of the Agent CI idea. Last updated 2024 |
+| [runner.server](https://github.com/ChristopherHX/runner.server) | Fork of the official runner | Emulated locally | Not needed | The forerunner of the Local CI idea. Last updated 2024 |
 
 Always run `actionlint` (syntax, expressions, shellcheck) and `zizmor` (security) first as static checks.
 
@@ -144,7 +144,7 @@ Pitfalls in the setup:
 - The Podman driver has no setting for amd64. `extra_opts` are options for podman itself and do not reach `--platform`. Build an amd64-only image with `podman build --platform linux/amd64` and use it with `pre_build_image: true`.
 - Molecule core (array) and the Podman driver (object) disagree on the schema of `tmpfs`, so either form fails validation. With `systemd: always` podman mounts `/run` and `/tmp` as tmpfs automatically, so leave it out.
 
-### Local CI (formerly Agent CI) + podman
+### Local CI + podman
 
 (Before the fix) **The job succeeded, but the `run-local-ci` command never noticed it had finished and kept waiting.** The official runner completed all steps in about 10 seconds and the container exited with code 0. It did not return after more than 10 minutes and was stopped with Ctrl+C. run-local-ci (latest on npm), podman 6.2.0, 2026-11-18.
 
@@ -288,7 +288,7 @@ The chosen setup (podman + Molecule + Local CI) can be used internally at no ext
 | podman | Apache-2.0 | Free |
 | Apple `container` | Apache-2.0 | Free |
 | Molecule | MIT | Free |
-| Local CI / Agent CI | FSL-1.1-MIT (RedwoodJS Inc.) | Internal use is explicitly allowed. Offering it as a competing commercial service is not. Each version becomes MIT after 2 years. Not OSI-approved |
+| Local CI | FSL-1.1-MIT (RedwoodJS Inc.) | Internal use is explicitly allowed. Offering it as a competing commercial service is not. Each version becomes MIT after 2 years. Not OSI-approved |
 | tart | FSL-1.1-ALv2 (OpenAI) | Internal use allowed. The old Fair Source licence (paid above 100 cores) is gone. The 2-VM limit is Apple's macOS VM restriction |
 | act | MIT | Free |
 | Docker Desktop | Commercial | Paid for companies with more than 250 employees or more than $10M annual revenue |

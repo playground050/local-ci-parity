@@ -1,6 +1,6 @@
 # Mac での Ansible / GitHub Actions ローカル検証環境 調査まとめ
 
-最終更新: 2026-11-21
+最終更新: 2026-11-22
 
 ## 概要と結論
 
@@ -23,22 +23,22 @@ Ansible のロールと GitHub Actions の workflow を Mac 上で検証する�
 
 ## GitHub Actions のローカル検証
 
-普段のループは **Agent CI**、GitHub 側にしかない機能の最終確認は **self-hosted runner** の 2 段構えにする。手段は「runner が本物か」「GitHub のサーバー側が本物か」で 3 系統に分かれる。
+普段のループは **Local CI**、GitHub 側にしかない機能の最終確認は **self-hosted runner** の 2 段構えにする。手段は「runner が本物か」「GitHub のサーバー側が本物か」で 3 系統に分かれる。
 
 | 手段 | runner | サーバー側 | push | 向き不向き |
 | --- | --- | --- | --- | --- |
-| [Agent CI](https://github.com/redwoodjs/agent-ci)（redwoodjs、旧名のままでも利用可） | 公式 | ローカルで模倣 | 不要 | 失敗したステップで一時停止し、直してそのステップだけ再実行できる。エージェント向け。0.x 系で初期段階 |
+| [Local CI](https://github.com/redwoodjs/local-ci)（redwoodjs） | 公式 | ローカルで模倣 | 不要 | 失敗したステップで一時停止し、直してそのステップだけ再実行できる。エージェント向け。0.x 系で初期段階 |
 | self-hosted runner（ephemeral） | 公式 | GitHub.com | 必要 | OIDC、environment、本物の secret まで確かめられる。Docker の action を使うなら Linux 上で動かす |
 | [act](https://github.com/nektos/act) | 再実装 | 模倣 | 不要 | 最も普及。`workflow_run` や GitHub API を呼ぶ action は差が出る |
 | [wrkflw](https://github.com/bahdotsh/wrkflw) | 再実装 | 模倣 | 不要 | act に近い代替 |
-| [runner.server](https://github.com/ChristopherHX/runner.server) | 公式の fork | ローカルで模倣 | 不要 | Agent CI と同じ発想の先駆け。最終更新 2024 年 |
+| [runner.server](https://github.com/ChristopherHX/runner.server) | 公式の fork | ローカルで模倣 | 不要 | Local CI と同じ発想の先駆け。最終更新 2024 年 |
 
 静的チェックとして `actionlint`（構文・式・shellcheck）と `zizmor`（セキュリティ）を常に先に回す。
 
-**Agent CI を使うときの注意**
+**Local CI を使うときの注意**
 
 - デフォルトの runner イメージ（`ghcr.io/actions/actions-runner`）には `python3` がない。Ansible を動かす workflow には独自の Dockerfile が必要。
-- Docker API が必要。podman では `podman-mac-helper install` で `/var/run/docker.sock` を用意する（検証済み。詳細は「Local CI（旧 Agent CI）＋ podman」）。
+- Docker API が必要。podman では `podman-mac-helper install` で `/var/run/docker.sock` を用意する（検証済み。詳細は「Local CI＋ podman」）。
 - Mac 上のコンテナは基本 ARM64。GitHub の `ubuntu-latest` は x86_64 なので、`amd64` 前提のステップは差が出る。
 
 ## Ansible のローカル検証
@@ -144,7 +144,7 @@ podman run --rm --platform linux/amd64 docker.io/library/ubuntu:24.04 \
 - Podman ドライバに amd64 を指定する設定はない。`extra_opts` は podman 自体へのオプションで `--platform` は渡せない。`podman build --platform linux/amd64` で amd64 だけのイメージを作り、`pre_build_image: true` で使う。
 - `tmpfs` は Molecule 本体（配列）と Podman ドライバ（オブジェクト）でスキーマが食い違い、どちらで書いても検証エラーになる。`systemd: always` なら podman が `/run` と `/tmp` を自動で tmpfs にするので、指定しない。
 
-### Local CI（旧 Agent CI）＋ podman
+### Local CI＋ podman
 
 （修正前）**ジョブは成功したが、`run-local-ci` のコマンドが終了を検知できず待ち続けた。** 公式 runner は約 10 秒で全ステップを完了し、コンテナも終了コード 0 で終わった。10 分以上待っても戻らず Ctrl+C で止めた。run-local-ci（npm 最新版）、podman 6.2.0、2026-11-18 に実施。
 
@@ -281,20 +281,20 @@ Local CI を使う場合は、さらに 2 つ準備する。zsh で `#` の行�
 
 ## ライセンスと費用
 
-採用する構成（podman + Molecule + Agent CI）は、社内利用なら追加費用なしで使える。有料になりうるのは Docker Desktop と OrbStack を使う場合。法的な最終判断は社内の担当部署に確認する。
+採用する構成（podman + Molecule + Local CI）は、社内利用なら追加費用なしで使える。有料になりうるのは Docker Desktop と OrbStack を使う場合。法的な最終判断は社内の担当部署に確認する。
 
 | ツール | ライセンス | 企業での利用 |
 | --- | --- | --- |
 | podman | Apache-2.0 | 無料 |
 | Apple `container` | Apache-2.0 | 無料 |
 | Molecule | MIT | 無料 |
-| Agent CI | FSL-1.1-MIT（RedwoodJS Inc.） | 社内利用は明示的に許可。競合する商用サービスとしての提供は不可。各版は 2 年後に MIT。OSI 承認ではない |
+| Local CI | FSL-1.1-MIT（RedwoodJS Inc.） | 社内利用は明示的に許可。競合する商用サービスとしての提供は不可。各版は 2 年後に MIT。OSI 承認ではない |
 | tart | FSL-1.1-ALv2（OpenAI） | 社内利用は許可。旧 Fair Source（100 コア超で有料）は廃止。上限 2 台は Apple の macOS VM の制限 |
 | act | MIT | 無料 |
 | Docker Desktop | 商用 | 従業員 250 人超または年商 1,000 万ドル超の企業は有料 |
 | OrbStack | 商用 | 商用は 1 人月 8 ドル（年払い） |
 
-Agent CI は GitHub Actions の実行時間を消費しない。self-hosted runner も GitHub 側の実行時間の課金対象外だが、常駐させるなら ephemeral で登録し、private リポジトリに限定する。
+Local CI は GitHub Actions の実行時間を消費しない。self-hosted runner も GitHub 側の実行時間の課金対象外だが、常駐させるなら ephemeral で登録し、private リポジトリに限定する。
 
 ## 未確認事項と次の作業
 
@@ -309,14 +309,13 @@ Agent CI は GitHub Actions の実行時間を消費しない。self-hosted runn
 - [ ] チームの Mac に containers.conf の設定を展開する
 - [ ] 対象リポジトリに Molecule のシナリオ（amd64 の Ubuntu）を追加する
 - [ ] lint、check、Molecule、冪等性をまとめて回し、未確認事項もレポートに書き出す `verify` スクリプト（将来はエージェント向けの `verify-infra` skill）を作る
-- [ ] Ansible を動かす workflow 用に、python3 入りの Agent CI 用 Dockerfile を用意する
+- [ ] Ansible を動かす workflow 用に、python3 入りの Local CI 用 Dockerfile を用意する
 - [ ] ansible-lint のカスタムルール（`ignore_errors` 禁止など）を追加する
 
 ## 参考リンク
 
 - [All Code Is Slop (Except Mine) — Lauren Tan, SpaceXSI（YouTube）](https://www.youtube.com/watch?v=O_zcc6Xl12g)
 - [pstack（cursor/plugins）](https://github.com/cursor/plugins/tree/main/pstack)
-- [Agent CI（redwoodjs/agent-ci）](https://github.com/redwoodjs/agent-ci)
 - [nektos/act](https://github.com/nektos/act)、[Thoughtworks Radar: Act](https://www.thoughtworks.com/radar/tools/act)
 - [ChristopherHX/runner.server](https://github.com/ChristopherHX/runner.server)
 - [GitHub Docs: self-hosted runners](https://docs.github.com/en/actions/reference/runners/self-hosted-runners)
