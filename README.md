@@ -13,6 +13,13 @@
 
 レポートは、Local CI の仕様として分かっている違い（[`.github/parity/known.json`](.github/parity/known.json)、理由と根拠のドキュメント付き）を「既知の違い」にまとめ、それ以外を「要確認」として先に出す。要確認に出たものは、Local CI の不具合か、まだ分類していない違い。調べて仕様だと分かったら `known.json` に足す。
 
+## 調査まとめ
+
+Mac で Ansible と GitHub Actions をローカル検証する環境の調査結果（podman + Rosetta、Molecule、Local CI の修正と Podman での動かし方）。
+
+- [日本語](docs/mac-local-verification.ja.md)
+- [English](docs/mac-local-verification.en.md)
+
 ## ファイル
 
 - `.github/workflows/parity-probe.yml` … 調査用 workflow（本物と Local CI の両方で実行）
