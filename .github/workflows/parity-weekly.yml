@@ -7,13 +7,13 @@ on:
     inputs:
       localci_source:
         description: "使う Local CI。github:<owner>/<repo>@<branch> でソースからビルド、npm:<package> で npm 版"
-        default: "github:playground050/local-ci@fixes/all"
+        default: "github:playground050/local-ci@parity-and-podman"
 permissions:
   contents: read
 env:
   # 入力値は run: に直接埋め込まず、環境変数で渡す（スクリプトへの注入を防ぐ）
   # 毎週の定期実行では、修正を入れた fork を使う
-  LCI_SOURCE: ${{ inputs.localci_source || 'github:playground050/local-ci@fixes/all' }}
+  LCI_SOURCE: ${{ inputs.localci_source || 'github:playground050/local-ci@parity-and-podman' }}
 concurrency:
   group: parity-weekly
   cancel-in-progress: false

@@ -181,7 +181,7 @@ Node.js 26.13.1 gave the same result: without the patch it had not finished afte
 
 ### Running the fork under Podman
 
-**With the fork's `fixes/all`, Local CI's own full test suite (`pnpm local-ci-dev run --all`) passes 51 of 52 workflows on macOS Podman.** The one failure, the linux-x64 build in `native-binaries`, is a cross-compile that cannot link on an arm64 host. The same suite on GitHub also gives 51 of 52. Verified 2026-11-21.
+**With the fork's `parity-and-podman`, Local CI's own full test suite (`pnpm local-ci-dev run --all`) passes 51 of 52 workflows on macOS Podman.** The one failure, the linux-x64 build in `native-binaries`, is a cross-compile that cannot link on an arm64 host. The same suite on GitHub also gives 51 of 52. Verified 2026-11-21.
 
 | Symptom | Cause | Fix in the fork |
 | --- | --- | --- |
@@ -200,7 +200,7 @@ To see how closely Local CI matches the real thing, the same probe workflow is r
 
 What is checked: environment variables; the github / runner / job / steps / needs / strategy / matrix contexts; `toJSON`; step- and job-level `continue-on-error`; `if: always()` jobs after a failure; outputs of failed jobs; step `if:` conditions; matrices (Cartesian product, include, exclude, matrices built from a previous job's outputs, letting only some combinations fail); expression functions and operators; GITHUB_ENV / GITHUB_PATH and env precedence; shell and working-directory; services; actions/cache; reusable-workflow inputs and outputs; job-level if: / runs-on / env / matrix expressions.
 
-The first comparison (Local CI 0.18.1) found many differences that the documentation did not mention, as well as behaviour that contradicted features the documentation lists as supported. They were fixed in a fork ([playground050/local-ci](https://github.com/playground050/local-ci), branch `fixes/all`) and each fix was checked against the real GitHub Actions.
+The first comparison (Local CI 0.18.1) found many differences that the documentation did not mention, as well as behaviour that contradicted features the documentation lists as supported. They were fixed in a fork ([playground050/local-ci](https://github.com/playground050/local-ci), branch `parity-and-podman`) and each fix was checked against the real GitHub Actions.
 
 | Fix | Behaviour before the fix |
 | --- | --- |
@@ -254,24 +254,30 @@ The key is **to set `provider = "applehv"` and `rosetta = true` in containers.co
    provider = "applehv"
    rosetta = true
    ```
-3. Remove the old machine created with libkrun and create it again.
+3. Remove the old machine created with libkrun and create it again, sharing only the folder your repositories live in (here `~/work`). Without `--volume`, the machine shares `/Users` (every user's home), `/private` and `/var/folders` with the VM.
 
    ```
    podman machine rm -f
    CONTAINERS_MACHINE_PROVIDER=libkrun podman machine rm -f 2>/dev/null
-   podman machine init
+   podman machine init --volume "$HOME/work:$HOME/work"
    podman machine start
    ```
-4. Check. Success means `VM TYPE` is `applehv`, `"Rosetta": true`, and `rosetta` appears in binfmt.
+4. Check. Success means `VM TYPE` is `applehv`, `"Rosetta": true`, `rosetta` appears in binfmt, and `~/work` is the only shared folder (`/var/mnt` is Rosetta's own mount).
 
    ```
    podman machine list
    podman machine inspect | grep -i rosetta
    podman machine ssh "ls /proc/sys/fs/binfmt_misc/"
+   podman machine ssh "mount -t virtiofs"
    ```
 5. Use the check command from the verification results to confirm that `rosetta` appears in maps.
 
-Optional: when using tools that need the Docker API, such as Local CI, run `sudo podman-mac-helper install` and restart the machine. If lines starting with `#` cause errors in zsh, run `setopt interactivecomments`.
+For Local CI, two more steps. If lines starting with `#` cause errors in zsh, run `setopt interactivecomments`.
+
+- Create `/var/run/docker.sock` with `sudo "$(brew --prefix podman)/bin/podman-mac-helper" install` and restart the machine.
+- Add `export LOCAL_CI_WORKING_DIR="$HOME/work/.local-ci"` to your shell profile. Local CI's working directory defaults to a folder under `/var/folders`, which can no longer be mounted once sharing is limited to `~/work`.
+
+**Why share only one folder**: Local CI gives every job the Podman API socket. A job that can reach the socket can start a privileged container, so it can read and write every Mac folder shared with the VM. With the default shares that is your whole home folder (including `~/.ssh` and credentials) and your temp folder; sharing only `~/work` limits it to your repositories. Shared files are accessed with your own Mac user's permissions, so other users' and root's files cannot be changed either way.
 
 ## Licences and cost
 
@@ -295,7 +301,7 @@ Local CI does not consume GitHub Actions minutes. Self-hosted runners are not bi
 **Open questions**
 
 - Does using Rosetta with applehv require the legacy Rosetta (`libRosettaRuntime`) to be installed? On hold: this Mac already has it, so this needs another macOS 27 Mac without it.
-- Local CI fixes live in the fork ([playground050/local-ci](https://github.com/playground050/local-ci), `fixes/all`). Upstream has not been updated since 2026-09; the exit-detection problem is registered as issue #403 (open). Upstream PRs are limited to collaborators, so reporting via issues is under consideration.
+- Local CI fixes live in the fork ([playground050/local-ci](https://github.com/playground050/local-ci), `parity-and-podman`). Upstream has not been updated since 2026-09; the exit-detection problem is registered as issue #403 (open). Upstream PRs are limited to collaborators, so reporting via issues is under consideration.
 - Does the target x86 package contain kernel modules (`.ko`)? (`dpkg -c <package>.deb | grep '\.ko'`) If so, it cannot be verified with Rosetta.
 
 **Next steps**
@@ -311,7 +317,7 @@ Local CI does not consume GitHub Actions minutes. Self-hosted runners are not bi
 - [All Code Is Slop (Except Mine) — Lauren Tan, SpaceXSI (YouTube)](https://www.youtube.com/watch?v=O_zcc6Xl12g)
 - [pstack (cursor/plugins)](https://github.com/cursor/plugins/tree/main/pstack)
 - [Local CI (redwoodjs/local-ci)](https://github.com/redwoodjs/local-ci), [compatibility table](https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md)
-- [Fork with fixes (playground050/local-ci, fixes/all)](https://github.com/playground050/local-ci/tree/fixes/all)
+- [Fork with fixes (playground050/local-ci, parity-and-podman)](https://github.com/playground050/local-ci/tree/parity-and-podman)
 - [Parity report against the real GitHub Actions (playground050/local-ci-parity)](https://github.com/playground050/local-ci-parity/blob/main/reports/gha/latest.md)
 - [nektos/act](https://github.com/nektos/act), [Thoughtworks Radar: Act](https://www.thoughtworks.com/radar/tools/act)
 - [ChristopherHX/runner.server](https://github.com/ChristopherHX/runner.server)

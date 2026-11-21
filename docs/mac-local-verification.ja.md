@@ -181,7 +181,7 @@ Node.js 26.13.1 でも同じ結果だった。パッチなしは 90 秒たって
 
 ### fork を Podman で動かす
 
-**fork の `fixes/all` では、Local CI 自身のテスト一式（`pnpm local-ci-dev run --all`）が macOS の Podman で 52 本中 51 本成功する。** 失敗する 1 本は `native-binaries` の linux-x64 のビルドで、arm64 のホストではリンクできないクロスコンパイルのため。GitHub 上で同じテストを流しても 52 本中 51 本。2026-11-21 に確認。
+**fork の `parity-and-podman` では、Local CI 自身のテスト一式（`pnpm local-ci-dev run --all`）が macOS の Podman で 52 本中 51 本成功する。** 失敗する 1 本は `native-binaries` の linux-x64 のビルドで、arm64 のホストではリンクできないクロスコンパイルのため。GitHub 上で同じテストを流しても 52 本中 51 本。2026-11-21 に確認。
 
 | 症状 | 原因 | fork での修正 |
 | --- | --- | --- |
@@ -200,7 +200,7 @@ Local CI がどこまで本物と同じに動くかを、同じ調査用 workflo
 
 確認している項目: 環境変数、github / runner / job / steps / needs / strategy / matrix コンテキスト、`toJSON`、step と job の `continue-on-error`、失敗後の `if: always()` の job、失敗した job の出力、step の `if:`、matrix（直積、include、exclude、前の job の出力から作る matrix、一部の組み合わせだけ失敗を許す設定）、式の関数と演算子、GITHUB_ENV / GITHUB_PATH と env の優先順位、shell と working-directory、services、actions/cache、再利用ワークフローの inputs / outputs、job の if: / runs-on / env / matrix の式。
 
-最初の比較（Local CI 0.18.1）では、ドキュメントに書かれていない違いや、ドキュメントでは対応済みなのに違う動きが多数見つかった。fork（playground050/local-ci の `fixes/all`）で直し、すべて本物と並べて確かめた。
+最初の比較（Local CI 0.18.1）では、ドキュメントに書かれていない違いや、ドキュメントでは対応済みなのに違う動きが多数見つかった。fork（playground050/local-ci の `parity-and-podman`）で直し、すべて本物と並べて確かめた。
 
 | 修正 | 直す前の動き |
 | --- | --- |
@@ -254,24 +254,30 @@ Local CI がどこまで本物と同じに動くかを、同じ調査用 workflo
    provider = "applehv"
    rosetta = true
    ```
-3. libkrun で作った古い machine を消して作り直す。
+3. libkrun で作った古い machine を消し、共有するフォルダをリポジトリを置くフォルダ（ここでは `~/work`）だけに絞って作り直す。`--volume` を付けないと、`/Users`（全ユーザーのホーム）、`/private`、`/var/folders` が仮想マシンと共有される。
 
    ```
    podman machine rm -f
    CONTAINERS_MACHINE_PROVIDER=libkrun podman machine rm -f 2>/dev/null
-   podman machine init
+   podman machine init --volume "$HOME/work:$HOME/work"
    podman machine start
    ```
-4. 確認する。`VM TYPE` が `applehv`、`"Rosetta": true`、binfmt に `rosetta` があれば成功。
+4. 確認する。`VM TYPE` が `applehv`、`"Rosetta": true`、binfmt に `rosetta` があり、共有が `~/work` だけ（`/var/mnt` は Rosetta 用）なら成功。
 
    ```
    podman machine list
    podman machine inspect | grep -i rosetta
    podman machine ssh "ls /proc/sys/fs/binfmt_misc/"
+   podman machine ssh "mount -t virtiofs"
    ```
 5. 検証結果の章の判定コマンドで、maps に `rosetta` が出ることを確かめる。
 
-任意: Agent CI など Docker API を使うツールと併用するなら `sudo podman-mac-helper install` のあと machine を再起動する。zsh で `#` の行がエラーになる場合は `setopt interactivecomments`。
+Local CI を使う場合は、さらに 2 つ準備する。zsh で `#` の行がエラーになる場合は `setopt interactivecomments`。
+
+- `sudo "$(brew --prefix podman)/bin/podman-mac-helper" install` で `/var/run/docker.sock` を作り、machine を再起動する。
+- シェルの設定ファイルに `export LOCAL_CI_WORKING_DIR="$HOME/work/.local-ci"` を書く。Local CI の作業フォルダは既定で `/var/folders` の中にあり、共有を `~/work` に絞るとマウントできなくなるため。
+
+**共有を絞る理由**: Local CI はすべてのジョブに Podman の API ソケットを渡す。ソケットに接続できるジョブは特権コンテナを起動できるので、仮想マシンに共有された Mac のフォルダを読み書きできる。既定の共有では、ホーム全体（`~/.ssh` や認証情報を含む）と一時フォルダに届く。`~/work` に絞れば、届く範囲をリポジトリだけにできる。共有したファイルは Mac の自分のユーザーの権限で扱われるので、他のユーザーや root のファイルはどちらの場合も書き換えられない。
 
 ## ライセンスと費用
 
@@ -295,7 +301,7 @@ Agent CI は GitHub Actions の実行時間を消費しない。self-hosted runn
 **未確認**
 
 - applehv で Rosetta を使うのに、従来の Rosetta（`libRosettaRuntime`）のインストールが必要か。保留中。この Mac は既に入れてしまったので、従来の Rosetta を入れていない macOS 27 の別の Mac で確認する。
-- Local CI の修正は fork（[playground050/local-ci](https://github.com/playground050/local-ci) の `fixes/all`）に入れて使っている。上流は 2026-09 から更新が止まっており、終了検知の問題は issue #403（open）として登録済み。上流の PR は collaborator に限られているため、issue での報告を検討する。
+- Local CI の修正は fork（[playground050/local-ci](https://github.com/playground050/local-ci) の `parity-and-podman`）に入れて使っている。上流は 2026-09 から更新が止まっており、終了検知の問題は issue #403（open）として登録済み。上流の PR は collaborator に限られているため、issue での報告を検討する。
 - 対象の x86 パッケージにカーネルモジュール（`.ko`）が含まれるか（`dpkg -c`` <パッケージ>.``deb`` | grep '\.ko'`）。含まれれば Rosetta では確かめられない。
 
 **次の作業**
@@ -324,5 +330,5 @@ Agent CI は GitHub Actions の実行時間を消費しない。self-hosted runn
 - [Apple macOS VM の同時実行上限（Eclectic Light）](https://eclecticlight.co/2022/08/04/virtualisation-on-apple-silicon-macs-8-how-apple-limits-vms/)
 - [Docker の料金](https://docker.io/pricing)
 - [Local CI（redwoodjs/local-ci）](https://github.com/redwoodjs/local-ci)、[互換性の一覧](https://github.com/redwoodjs/local-ci/blob/main/packages/cli/compatibility.md)
-- [修正を入れた fork（playground050/local-ci、fixes/all）](https://github.com/playground050/local-ci/tree/fixes/all)
+- [修正を入れた fork（playground050/local-ci、parity-and-podman）](https://github.com/playground050/local-ci/tree/parity-and-podman)
 - [本物との比較レポート（playground050/local-ci-parity）](https://github.com/playground050/local-ci-parity/blob/main/reports/gha/latest.md)

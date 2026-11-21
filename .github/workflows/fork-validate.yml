@@ -6,7 +6,7 @@ on:
     inputs:
       ref:
         description: playground050/local-ci の ref
-        default: fixes/all
+        default: parity-and-podman
 permissions:
   contents: read
 jobs:
