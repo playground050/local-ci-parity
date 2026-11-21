@@ -7,9 +7,8 @@
 | レポート | 実行する場所 | 比べるもの |
 | --- | --- | --- |
 | [`reports/gha/latest.md`](reports/gha/latest.md) | GitHub Actions（`parity-weekly.yml`、毎週月曜 09:17 JST） | 本物 vs Local CI on Docker（どちらも ubuntu-latest、x86_64） |
-| [`reports/mac/latest.md`](reports/mac/latest.md) | 手元の Mac（launchd） | 本物 vs Local CI on podman（applehv + Rosetta、arm64） |
 
-各フォルダの `history.csv` に週ごとの件数、`YYYY-MM-DD.md` の先頭に前回からの変化がある。
+`reports/gha/` の `history.csv` に週ごとの件数、`YYYY-MM-DD.md` の先頭に前回からの変化がある。Mac の Podman 上での動作は、この比較ではなく fork の自己テスト（`pnpm local-ci-dev run --all`）で確かめている（[調査まとめ](docs/mac-local-verification.ja.md)）。
 
 レポートは、Local CI の仕様として分かっている違い（[`.github/parity/known.json`](.github/parity/known.json)、理由と根拠のドキュメント付き）を「既知の違い」にまとめ、それ以外を「要確認」として先に出す。要確認に出たものは、Local CI の不具合か、まだ分類していない違い。調べて仕様だと分かったら `known.json` に足す。
 
