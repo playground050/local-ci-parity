@@ -361,21 +361,11 @@ The Podman setup (podman + Molecule + Local CI) can be used internally at no ext
 
 Local CI does not consume GitHub Actions minutes. Self-hosted runners are not billed for GitHub-side minutes either, but if one stays resident, register it as ephemeral and limit it to private repositories.
 
-## Open questions and next steps
-
-**Open questions**
+## Open questions
 
 - Does using Rosetta with applehv require the legacy Rosetta (`libRosettaRuntime`) to be installed? On hold: this Mac already has it, so this needs another macOS 27 Mac without it.
 - Local CI fixes live in the fork ([playground050/local-ci](https://github.com/playground050/local-ci), `parity-and-podman`). Upstream has not been updated since 2026-09; the exit-detection problem is registered as issue #403 (open). Upstream PRs are limited to collaborators, so reporting via issues is under consideration.
 - Does the target x86 package contain kernel modules (`.ko`)? (`dpkg -c <package>.deb | grep '\.ko'`) If so, it cannot be verified with Rosetta.
-
-**Next steps**
-
-- [ ] Roll out the containers.conf settings to the team's Macs
-- [ ] Add a Molecule scenario (amd64 Ubuntu) to the target repositories
-- [ ] Write a `verify` script that runs lint, check, Molecule and idempotence together and reports open items (later an agent-facing `verify-infra` skill)
-- [ ] Prepare a Local CI Dockerfile with python3 for workflows that run Ansible
-- [ ] Add custom ansible-lint rules (forbid `ignore_errors` etc.)
 
 ## References
 
@@ -396,3 +386,7 @@ Local CI does not consume GitHub Actions minutes. Self-hosted runners are not bi
 - [tart (openai/tart)](https://github.com/openai/tart)
 - [Limit on concurrent macOS VMs (Eclectic Light)](https://eclecticlight.co/2022/08/04/virtualisation-on-apple-silicon-macs-8-how-apple-limits-vms/)
 - [Docker pricing](https://docker.io/pricing)
+
+---
+
+*This article was written with the help of AI (Claude). The author ran the tests and measurements and reviewed the text.*

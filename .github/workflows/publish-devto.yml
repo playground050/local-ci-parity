@@ -1,0 +1,41 @@
+name: publish-devto
+
+# Mirrors the English findings doc to dev.to. The GitHub copy stays the
+# original (canonical_url), and a new article is created as a draft.
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/mac-local-verification.en.md
+      - scripts/publish-devto.sh
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Print the article instead of sending it
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-devto
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Publish to dev.to
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          DOC: docs/mac-local-verification.en.md
+          CANONICAL_URL: https://github.com/${{ github.repository }}/blob/main/docs/mac-local-verification.en.md
+          TAGS: githubactions, ansible, podman, docker
+          DESCRIPTION: Running GitHub Actions and Ansible (Molecule) checks on an Apple Silicon Mac with Local CI, Podman and Docker Desktop, including amd64 + systemd.
+        run: bash scripts/publish-devto.sh
