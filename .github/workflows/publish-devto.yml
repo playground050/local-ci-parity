@@ -1,12 +1,12 @@
 name: publish-devto
 
-# Mirrors the English findings doc to dev.to. The GitHub copy stays the
+# Mirrors the English article to dev.to. The GitHub copy stays the
 # original (canonical_url), and a new article is created as a draft.
 on:
   push:
     branches: [main]
     paths:
-      - docs/mac-local-verification.en.md
+      - docs/local-ci-parity.en.md
       - scripts/publish-devto.sh
   workflow_dispatch:
     inputs:
@@ -34,8 +34,8 @@ jobs:
         env:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
-          DOC: docs/mac-local-verification.en.md
-          CANONICAL_URL: https://github.com/${{ github.repository }}/blob/main/docs/mac-local-verification.en.md
-          TAGS: githubactions, ansible, podman, docker
-          DESCRIPTION: Running GitHub Actions and Ansible (Molecule) checks on an Apple Silicon Mac with Local CI, Podman and Docker Desktop, including amd64 + systemd.
+          DOC: docs/local-ci-parity.en.md
+          CANONICAL_URL: https://github.com/${{ github.repository }}/blob/main/docs/local-ci-parity.en.md
+          TAGS: githubactions, ci, testing, abotwrotethis
+          DESCRIPTION: I fixed Local CI in a fork and compare it with real GitHub Actions every week. The latest run has 0 unexplained differences.
         run: bash scripts/publish-devto.sh
