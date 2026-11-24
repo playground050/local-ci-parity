@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | [`reports/gha/latest.md`](reports/gha/latest.md) | GitHub Actions（`parity-weekly.yml`、毎週月曜 09:17 JST） | 本物 vs Local CI on Docker（どちらも ubuntu-latest、x86_64） |
 
-`reports/gha/` の `history.csv` に週ごとの件数、`YYYY-MM-DD.md` の先頭に前回からの変化がある。Mac の Podman 上での動作は、この比較ではなく fork の自己テスト（`pnpm local-ci-dev run --all`）で確かめている（[調査まとめ](docs/mac-local-verification.ja.md)）。
+`reports/gha/` の `history.csv` に週ごとの件数、`YYYY-MM-DD.md` の先頭に前回からの変化がある。Mac の Podman 上での動作は、この比較ではなく fork の自己テスト（`pnpm local-ci-dev run --all`）で確かめている（[調査まとめ](docs/mac-local-verification.en.md)）。
 
 レポートは、Local CI の仕様として分かっている違い（[`.github/parity/known.json`](.github/parity/known.json)、理由と根拠のドキュメント付き）を「既知の違い」にまとめ、それ以外を「要確認」として先に出す。要確認に出たものは、Local CI の不具合か、まだ分類していない違い。調べて仕様だと分かったら `known.json` に足す。
 
@@ -16,8 +16,7 @@
 
 Mac で Ansible と GitHub Actions をローカル検証する環境の調査結果（podman + Rosetta、Molecule、Local CI の修正と Podman での動かし方）。
 
-- [日本語](docs/mac-local-verification.ja.md)
-- [English](docs/mac-local-verification.en.md)
+- [Verifying Ansible and GitHub Actions locally on a Mac — findings](docs/mac-local-verification.en.md)（英語）
 
 ## ファイル
 
