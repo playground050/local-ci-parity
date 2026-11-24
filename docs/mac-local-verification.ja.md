@@ -1,15 +1,15 @@
 # Mac での Ansible / GitHub Actions ローカル検証環境 調査まとめ
 
-最終更新: 2026-11-22
+最終更新: 2026-11-24
 
 ## 概要と結論
 
-Ansible のロールと GitHub Actions の workflow を Mac 上で検証する環境として、**podman（applehv + Rosetta）を採用する**。macOS 27 の Mac で、x86_64（amd64）の Linux コンテナ（Ubuntu 22.04 / 24.04 / 26.04）が Rosetta で動くことを確認した。
+Ansible のロールと GitHub Actions の workflow を Mac 上で検証する環境として、**Podman（applehv + Rosetta）か Docker Desktop（Rosetta はオフ）を使う**。費用がかからないのは Podman で、Docker Desktop は条件によって有料になる（「ライセンスと費用」）。macOS 27 の Mac で、x86_64（amd64）の Linux コンテナ（Ubuntu 22.04 / 24.04 / 26.04）が動くことを確認した。
 
-- **Ansible**: lint・check mode に加え、Molecule の Podman ドライバで amd64 のコンテナに適用し、冪等性まで確かめる。
+- **Ansible**: lint・check mode に加え、Molecule（Podman または Docker のドライバ）で amd64 のコンテナに適用し、冪等性まで確かめる。
 - **GitHub Actions**: 普段の確認は Local CI（旧 Agent CI。公式 runner をローカルで動かす）を、修正を入れた fork で使う。本物との違いは週次の parity 比較で記録し、既知の違い以外は 0 件になった。OIDC など GitHub 側にしかないものはテスト用ブランチ＋ephemeral な self-hosted runner で確かめる。
 - **x86**: macOS 27 の Rosetta は x86-64-v3 まで対応する。カーネルモジュールを含むパッケージ だけは QEMU かクラウドの x86 で確かめる。
-- **注意**: podman 6 の macOS でのデフォルト（libkrun）は Rosetta 非対応で、QEMU にフォールバックする。containers.conf での設定が必須。
+- **注意**: podman 6 の macOS でのデフォルト（libkrun）は Rosetta 非対応で、QEMU にフォールバックする。containers.conf での設定が必須。Docker Desktop では、amd64 のコンテナの systemd が Rosetta で不安定なので、Rosetta をオフにして QEMU で動かす。
 
 ## 背景：検証を中心に据える考え方
 
@@ -144,6 +144,41 @@ podman run --rm --platform linux/amd64 docker.io/library/ubuntu:24.04 \
 - Podman ドライバに amd64 を指定する設定はない。`extra_opts` は podman 自体へのオプションで `--platform` は渡せない。`podman build --platform linux/amd64` で amd64 だけのイメージを作り、`pre_build_image: true` で使う。
 - `tmpfs` は Molecule 本体（配列）と Podman ドライバ（オブジェクト）でスキーマが食い違い、どちらで書いても検証エラーになる。`systemd: always` なら podman が `/run` と `/tmp` を自動で tmpfs にするので、指定しない。
 
+### Molecule（Docker ドライバ）＋ amd64 ＋ systemd（Docker Desktop）
+
+**Docker Desktop では、Rosetta をオフにして QEMU で動かすと `molecule test` が最後まで成功した（1 分 42 秒）。** Rosetta を使うと、amd64 のコンテナの中の systemd がサービスを起動できなかったり、systemd ごと落ちたりする。同じイメージと role で、Podman（applehv + Rosetta）では安定していた。Docker Desktop 29.9.3、ansible-core 2.22.0、Molecule 26.11.0、molecule-plugins[docker]、2026-11-24 に実施。
+
+| 方法 | 結果 |
+| --- | --- |
+| amd64 + Rosetta | 不安定。cron などのサービスが終了コード 255 で起動できず、journald を含む標準サービスも失敗。systemd ごとコンテナが止まることもある |
+| amd64 + QEMU（Rosetta オフ） | 成功。converge、冪等性、verify（`x86_64`、PID 1 が `systemd`、変換は `qemu-x86_64`） |
+| arm64（ネイティブ） | 成功。converge と冪等性 |
+
+cron 自体は、Rosetta でも手で起動すれば動く。失敗するのは systemd がサービスを起動するときだけ。
+
+`molecule.yml` の要点（イメージは `docker build --platform linux/amd64` で amd64 だけのものを作っておく）:
+
+```
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2404-amd64
+    image: ubuntu2404-systemd-amd64:latest
+    pre_build_image: true
+    command: /sbin/init
+    privileged: true
+    cgroupns_mode: private
+    tmpfs:
+      - /run
+      - /tmp
+```
+
+設定でつまずいた点:
+
+- `cgroupns_mode: host` と `/sys/fs/cgroup` の共有（Docker で systemd を動かすときによく紹介される設定）では、標準サービス 26 個が失敗し、結果も安定しなかった。コンテナごとに分ける `cgroupns_mode: private` にする。
+- Docker ドライバには `pip install "molecule-plugins[docker]"` と `ansible-galaxy collection install community.docker` が必要。
+- Rosetta の設定は Docker Desktop 全体で 1 つだけ。Local CI の runner は arm64 で動くので、オフにしても影響は小さい。
+
 ### Local CI＋ podman
 
 （修正前）**ジョブは成功したが、`run-local-ci` のコマンドが終了を検知できず待ち続けた。** 公式 runner は約 10 秒で全ステップを完了し、コンテナも終了コード 0 で終わった。10 分以上待っても戻らず Ctrl+C で止めた。run-local-ci（npm 最新版）、podman 6.2.0、2026-11-18 に実施。
@@ -237,7 +272,11 @@ Local CI がどこまで本物と同じに動くかを、同じ調査用 workflo
 
 使い方の注意: Local CI は手元で失敗を見つけて直すための道具で、最終判断は本物の GitHub Actions に任せる。AI エージェントに使わせる場合は、既知の違いの一覧を指示ファイル（AGENTS.md など）に渡しておくと、Local CI でしか起きない失敗を直そうとする空回りを防げる。
 
-## podman のセットアップ手順
+## セットアップ手順
+
+費用をかけないなら Podman、Docker Desktop の契約がある（または無料で使える条件の）場合は Docker Desktop を使う。どちらでも Local CI の自己テストは 52 本中 51 本成功した（失敗は arm64 でリンクできない `native-binaries` の 1 本）。
+
+### Podman
 
 要点は、**containers.conf に `provider = "applehv"` と `rosetta = true` を書くこと**。podman 6 の macOS のデフォルトは libkrun で、環境変数 `CONTAINERS_MACHINE_PROVIDER` は各コマンドごとに読まれるため、付け忘れると libkrun に戻る。Rosetta の有無は起動のたびに containers.conf の値で決まる（`CONTAINERS_MACHINE_ROSETTA` は参照されていない）。
 
@@ -279,9 +318,35 @@ Local CI を使う場合は、さらに 2 つ準備する。zsh で `#` の行�
 
 **共有を絞る理由**: Local CI はすべてのジョブに Podman の API ソケットを渡す。ソケットに接続できるジョブは特権コンテナを起動できるので、仮想マシンに共有された Mac のフォルダを読み書きできる。既定の共有では、ホーム全体（`~/.ssh` や認証情報を含む）と一時フォルダに届く。`~/work` に絞れば、届く範囲をリポジトリだけにできる。共有したファイルは Mac の自分のユーザーの権限で扱われるので、他のユーザーや root のファイルはどちらの場合も書き換えられない。
 
+### Docker Desktop
+
+要点は、**Rosetta をオフにして amd64 のコンテナを QEMU で動かすこと**。Rosetta のほうが速いが、amd64 のコンテナの中の systemd が不安定で Molecule が通らない（検証結果の章）。
+
+1. インストールして起動する。
+
+   ```
+   brew install --cask docker-desktop
+   open -a Docker
+   ```
+2. Settings → General で、Virtual Machine Manager を「Apple Virtualization framework」にし、「Use Rosetta for x86_64/amd64 emulation on Apple Silicon」をオフにする。
+3. Settings → Resources → File sharing をリポジトリを置くフォルダ（ここでは `~/work`）だけにする。既定では `/Users` や `/var/folders` などを広く共有する。理由は Podman と同じ。
+4. 「Apply & restart」を押し、確認する。`qemu-x86_64` と表示されれば成功。
+
+   ```
+   docker info --format '{{.OperatingSystem}}'
+   docker run --rm --platform linux/amd64 docker.io/library/ubuntu:24.04 sh -c 'grep -o -E "rosetta|qemu[^ ]*" /proc/self/maps | head -1'
+   ```
+
+Local CI を使う場合は、さらに 2 つ準備する。
+
+- Settings → Advanced で「Allow the default Docker socket to be used」をオンにする（`/var/run/docker.sock` を作るため）。`ls -l /var/run/docker.sock` が `~/.docker/run/docker.sock` を指していればよい。
+- File sharing を絞った場合は、シェルの設定ファイルに `export LOCAL_CI_WORKING_DIR="$HOME/work/.local-ci"` を書く。
+
+Podman から切り替える場合は、先に `sudo "$(brew --prefix podman)/bin/podman-mac-helper" uninstall` と `podman machine stop` を実行しておく。残すと machine の起動時に `/var/run/docker.sock` が Podman 向けに張り替えられる。
+
 ## ライセンスと費用
 
-採用する構成（podman + Molecule + Local CI）は、社内利用なら追加費用なしで使える。有料になりうるのは Docker Desktop と OrbStack を使う場合。法的な最終判断は社内の担当部署に確認する。
+Podman を使う構成（podman + Molecule + Local CI）は、社内利用なら追加費用なしで使える。有料になりうるのは Docker Desktop と OrbStack を使う場合。法的な最終判断は社内の担当部署に確認する。
 
 | ツール | ライセンス | 企業での利用 |
 | --- | --- | --- |

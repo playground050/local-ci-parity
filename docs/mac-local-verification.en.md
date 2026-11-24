@@ -1,15 +1,15 @@
 # Verifying Ansible and GitHub Actions locally on a Mac — findings
 
-Last updated: 2026-11-22
+Last updated: 2026-11-24
 
 ## Summary and conclusions
 
-To verify Ansible roles and GitHub Actions workflows on a Mac, **we use podman (applehv + Rosetta)**. On a Mac running macOS 27 we confirmed that x86_64 (amd64) Linux containers (Ubuntu 22.04 / 24.04 / 26.04) run under Rosetta.
+To verify Ansible roles and GitHub Actions workflows on a Mac, **we use Podman (applehv + Rosetta) or Docker Desktop (Rosetta off)**. Podman costs nothing; Docker Desktop can require a paid subscription (see "Licences and cost"). On a Mac running macOS 27 we confirmed that x86_64 (amd64) Linux containers (Ubuntu 22.04 / 24.04 / 26.04) run.
 
-- **Ansible**: besides lint and check mode, apply roles to amd64 containers with Molecule's Podman driver and check idempotence.
+- **Ansible**: besides lint and check mode, apply roles to amd64 containers with Molecule (Podman or Docker driver) and check idempotence.
 - **GitHub Actions**: day-to-day checks run on Local CI (formerly Agent CI; it runs the official runner locally), using a fork with our fixes. Differences from the real GitHub Actions are recorded by a weekly parity comparison; apart from known, documented differences there are none left. Things that only exist on GitHub (OIDC etc.) are checked on a test branch with an ephemeral self-hosted runner.
 - **x86**: Rosetta on macOS 27 supports up to x86-64-v3. Only packages that contain kernel modules need QEMU or a real x86 machine in the cloud.
-- **Caveat**: podman 6's default provider on macOS (libkrun) does not support Rosetta and falls back to QEMU. The setting in containers.conf is required.
+- **Caveat**: podman 6's default provider on macOS (libkrun) does not support Rosetta and falls back to QEMU. The setting in containers.conf is required. On Docker Desktop, systemd inside amd64 containers is unstable under Rosetta, so turn Rosetta off and run them under QEMU.
 
 ## Background: putting verification at the centre
 
@@ -144,6 +144,41 @@ Pitfalls in the setup:
 - The Podman driver has no setting for amd64. `extra_opts` are options for podman itself and do not reach `--platform`. Build an amd64-only image with `podman build --platform linux/amd64` and use it with `pre_build_image: true`.
 - Molecule core (array) and the Podman driver (object) disagree on the schema of `tmpfs`, so either form fails validation. With `systemd: always` podman mounts `/run` and `/tmp` as tmpfs automatically, so leave it out.
 
+### Molecule (Docker driver) + amd64 + systemd (Docker Desktop)
+
+**On Docker Desktop, `molecule test` succeeded end to end with Rosetta turned off, running amd64 under QEMU (1 min 42 s).** With Rosetta, systemd inside the amd64 container fails to start services or exits altogether. The same image and role were stable on Podman (applehv + Rosetta). Docker Desktop 29.9.3, ansible-core 2.22.0, Molecule 26.11.0, molecule-plugins[docker], 2026-11-24.
+
+| Method | Result |
+| --- | --- |
+| amd64 + Rosetta | Unstable. Services such as cron fail to start with exit code 255, standard services including journald fail too, and sometimes the whole container stops with systemd |
+| amd64 + QEMU (Rosetta off) | Succeeded: converge, idempotence, verify (`x86_64`, PID 1 is `systemd`, translated by `qemu-x86_64`) |
+| arm64 (native) | Succeeded: converge and idempotence |
+
+cron itself runs under Rosetta when started by hand; it fails only when systemd starts it.
+
+The key parts of `molecule.yml` (build an amd64-only image first with `docker build --platform linux/amd64`):
+
+```
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2404-amd64
+    image: ubuntu2404-systemd-amd64:latest
+    pre_build_image: true
+    command: /sbin/init
+    privileged: true
+    cgroupns_mode: private
+    tmpfs:
+      - /run
+      - /tmp
+```
+
+Pitfalls in the setup:
+
+- With `cgroupns_mode: host` and a shared `/sys/fs/cgroup` (the setting often recommended for systemd under Docker), 26 standard services failed and results were inconsistent. Use `cgroupns_mode: private`, which gives the container its own cgroup namespace.
+- The Docker driver needs `pip install "molecule-plugins[docker]"` and `ansible-galaxy collection install community.docker`.
+- The Rosetta setting applies to all of Docker Desktop. Local CI's runner runs as arm64, so turning Rosetta off barely affects it.
+
 ### Local CI + podman
 
 (Before the fix) **The job succeeded, but the `run-local-ci` command never noticed it had finished and kept waiting.** The official runner completed all steps in about 10 seconds and the container exited with code 0. It did not return after more than 10 minutes and was stopped with Ctrl+C. run-local-ci (latest on npm), podman 6.2.0, 2026-11-18.
@@ -237,7 +272,11 @@ After the fixes the report shows "0 needing review". All remaining differences a
 
 How to use it: Local CI is a tool for finding and fixing failures locally; the final judgement belongs to the real GitHub Actions. When an AI agent uses it, give the agent the list of known differences in its instruction file (AGENTS.md etc.); this keeps it from "fixing" failures that only happen in Local CI.
 
-## Setting up podman
+## Setup
+
+Use Podman to avoid any cost, or Docker Desktop if you have a subscription (or qualify for free use). Local CI's own self-test passed 51 of 52 workflows on both; the one failure is `native-binaries`, which cannot link on arm64.
+
+### Podman
 
 The key is **to set `provider = "applehv"` and `rosetta = true` in containers.conf**. podman 6's default on macOS is libkrun, and the environment variable `CONTAINERS_MACHINE_PROVIDER` is read per command, so forgetting it puts you back on libkrun. Whether Rosetta is used is decided by the containers.conf value at every start (`CONTAINERS_MACHINE_ROSETTA` is not read).
 
@@ -279,9 +318,35 @@ For Local CI, two more steps. If lines starting with `#` cause errors in zsh, ru
 
 **Why share only one folder**: Local CI gives every job the Podman API socket. A job that can reach the socket can start a privileged container, so it can read and write every Mac folder shared with the VM. With the default shares that is your whole home folder (including `~/.ssh` and credentials) and your temp folder; sharing only `~/work` limits it to your repositories. Shared files are accessed with your own Mac user's permissions, so other users' and root's files cannot be changed either way.
 
+### Docker Desktop
+
+The key is **to turn Rosetta off and run amd64 containers under QEMU**. Rosetta is faster, but systemd inside amd64 containers is unstable under it and Molecule does not pass (see the verification results).
+
+1. Install and start it.
+
+   ```
+   brew install --cask docker-desktop
+   open -a Docker
+   ```
+2. In Settings → General, set Virtual Machine Manager to "Apple Virtualization framework" and turn off "Use Rosetta for x86_64/amd64 emulation on Apple Silicon".
+3. In Settings → Resources → File sharing, share only the folder your repositories live in (here `~/work`). By default Docker Desktop shares `/Users`, `/var/folders` and more; the reason to narrow it is the same as for Podman.
+4. Click "Apply & restart" and check. Success means `qemu-x86_64` is printed.
+
+   ```
+   docker info --format '{{.OperatingSystem}}'
+   docker run --rm --platform linux/amd64 docker.io/library/ubuntu:24.04 sh -c 'grep -o -E "rosetta|qemu[^ ]*" /proc/self/maps | head -1'
+   ```
+
+For Local CI, two more steps:
+
+- In Settings → Advanced, turn on "Allow the default Docker socket to be used" (this creates `/var/run/docker.sock`). `ls -l /var/run/docker.sock` should point to `~/.docker/run/docker.sock`.
+- If you narrowed File sharing, add `export LOCAL_CI_WORKING_DIR="$HOME/work/.local-ci"` to your shell profile.
+
+When switching from Podman, run `sudo "$(brew --prefix podman)/bin/podman-mac-helper" uninstall` and `podman machine stop` first. Otherwise starting the machine points `/var/run/docker.sock` back at Podman.
+
 ## Licences and cost
 
-The chosen setup (podman + Molecule + Local CI) can be used internally at no extra cost. Docker Desktop and OrbStack are the paid options. Confirm the final legal judgement with the responsible team.
+The Podman setup (podman + Molecule + Local CI) can be used internally at no extra cost. Docker Desktop and OrbStack are the paid options. Confirm the final legal judgement with the responsible team.
 
 | Tool | Licence | Use in a company |
 | --- | --- | --- |
